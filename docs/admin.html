@@ -126,11 +126,6 @@
     }
     [data-theme="dark"] .gc-badge { background: #1a3533; color: #7de8e0; }
     .gc-dot { width: 8px; height: 8px; border-radius: 50%; background: #22b857; flex-shrink: 0; }
-    .gc-features { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
-    .gc-tag {
-      background: rgba(78,205,196,0.12); border-radius: 999px;
-      padding: 3px 10px; font-size: 0.75rem; font-weight: 600; color: var(--teal);
-    }
 
     /* ── GoatCounter setup ── */
     .setup-steps { list-style: none; counter-reset: step; }
@@ -202,14 +197,9 @@
         <a id="gc-dash-link" href="#" target="_blank" rel="noopener" class="btn small">📊 פתח לוח בקרה ↗</a>
         <button class="btn small coral" onclick="disconnectGC()">נתק</button>
       </div>
-      <div class="gc-features">
-        <span class="gc-tag">🌍 מדינה</span>
-        <span class="gc-tag">📱 מכשיר</span>
-        <span class="gc-tag">🖥 מערכת הפעלה</span>
-        <span class="gc-tag">🌐 דפדפן</span>
-        <span class="gc-tag">🔗 לחיצות על קישורים</span>
-        <span class="gc-tag">📅 לפי שעה ויום</span>
-      </div>
+      <p style="font-size:0.82rem;color:var(--muted);margin-top:10px">
+        לוח הבקרה מציג: מדינה · מכשיר · מערכת הפעלה · דפדפן · לחיצות · שעות פעילות
+      </p>
     </div>
 
     <!-- Setup state (shown when no code yet) -->
