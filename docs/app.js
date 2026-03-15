@@ -204,34 +204,65 @@ function updateLive(cells) {
 // ── Lesson timer ───────────────────────────────────────────
 
 function updateLessonTimer() {
-  const timer = document.getElementById('lesson-timer');
-  const now     = new Date();
+  const timer     = document.getElementById('lesson-timer');
+  const now       = new Date();
   const dayOfWeek = now.getDay();
-  const nowSec  = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+  const nowSec    = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+  const nowMin    = now.getHours() * 60 + now.getMinutes();
 
   if (dayOfWeek > 4) { timer.style.display = 'none'; return; }
 
+  // Find current slot (in lesson) or next slot (between lessons)
   let currentSlot = -1;
+  let nextSlot    = -1;
   for (let i = 0; i < SLOT_MINS.length; i++) {
     const [s, e] = SLOT_MINS[i];
     if (nowSec >= s * 60 && nowSec < e * 60) { currentSlot = i; break; }
+    if (nowMin < s && nextSlot === -1) nextSlot = i;
   }
 
-  if (currentSlot === -1) { timer.style.display = 'none'; return; }
+  if (currentSlot !== -1) {
+    // ── In a lesson: show remaining time ──────────────────
+    const [slotStart, slotEnd] = SLOT_MINS[currentSlot];
+    const totalSec   = (slotEnd - slotStart) * 60;
+    const elapsedSec = nowSec - slotStart * 60;
+    const remainSec  = totalSec - elapsedSec;
+    const pct        = Math.min(100, (elapsedSec / totalSec) * 100);
+    const remainMin  = Math.ceil(remainSec / 60);
+    const label      = remainMin === 1 ? 'דקה אחת' : `${remainMin} דק׳`;
 
-  const [slotStart, slotEnd] = SLOT_MINS[currentSlot];
-  const totalSec   = (slotEnd - slotStart) * 60;
-  const elapsedSec = nowSec - slotStart * 60;
-  const remainSec  = totalSec - elapsedSec;
-  const pct        = Math.min(100, (elapsedSec / totalSec) * 100);
+    document.getElementById('lesson-timer-fill').style.width  = pct.toFixed(1) + '%';
+    document.getElementById('lesson-timer-label').textContent = `⏱ נשארו: ${label}`;
+    document.getElementById('lesson-timer-pct').textContent   = Math.round(pct) + '%';
+    document.getElementById('lesson-timer-fill').style.background =
+      'linear-gradient(90deg, #22b857, #4ECDC4)';
+    timer.style.display = 'flex';
 
-  const remainMin  = Math.ceil(remainSec / 60);
-  const label      = remainMin === 1 ? 'דקה אחת' : `${remainMin} דק׳`;
+  } else if (nextSlot !== -1) {
+    // ── Between lessons: countdown to next ────────────────
+    const [nextStart] = SLOT_MINS[nextSlot];
+    const remainSec   = nextStart * 60 - nowSec;
+    const totalBreak  = nextSlot === 0
+      ? nextStart * 60          // before school starts
+      : nextStart * 60 - SLOT_MINS[nextSlot - 1][1] * 60;
+    const elapsed  = totalBreak - remainSec;
+    const pct      = Math.min(100, (elapsed / totalBreak) * 100);
+    const mins     = Math.floor(remainSec / 60);
+    const secs     = remainSec % 60;
+    const label    = mins > 0
+      ? `השיעור הבא בעוד ${mins}:${String(secs).padStart(2, '0')}`
+      : `השיעור הבא בעוד ${secs} שנ׳`;
 
-  document.getElementById('lesson-timer-fill').style.width = pct.toFixed(1) + '%';
-  document.getElementById('lesson-timer-label').textContent = `⏱ נשארו: ${label}`;
-  document.getElementById('lesson-timer-pct').textContent   = Math.round(pct) + '%';
-  timer.style.display = 'flex';
+    document.getElementById('lesson-timer-fill').style.width  = pct.toFixed(1) + '%';
+    document.getElementById('lesson-timer-label').textContent = `🔔 ${label}`;
+    document.getElementById('lesson-timer-pct').textContent   = '';
+    document.getElementById('lesson-timer-fill').style.background =
+      'linear-gradient(90deg, var(--orange), #FFD700)';
+    timer.style.display = 'flex';
+
+  } else {
+    timer.style.display = 'none';
+  }
 }
 
 // ── Today-only toggle ──────────────────────────────────────
