@@ -105,6 +105,33 @@
     [data-theme="dark"] .notice { background: #3a3010; border-color: #6b4f00; color: #f0c060; }
     .notice a { color: var(--teal); font-weight: 700; }
 
+    /* ── GoatCounter ── */
+    .gc-connected {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    }
+    .gc-code-row {
+      display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px;
+    }
+    .gc-code-row input {
+      border: 2px solid #ddd; border-radius: 999px; padding: 8px 16px;
+      font-size: 0.9rem; font-family: 'Rubik', sans-serif; outline: none;
+      background: var(--bg); color: var(--text); width: 180px; text-align: center;
+      direction: ltr;
+    }
+    .gc-code-row input:focus { border-color: var(--teal); }
+    .gc-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #e8faf8; border: 1.5px solid var(--teal); border-radius: 999px;
+      padding: 6px 14px; font-size: 0.85rem; font-weight: 700; color: #1a7a74;
+    }
+    [data-theme="dark"] .gc-badge { background: #1a3533; color: #7de8e0; }
+    .gc-dot { width: 8px; height: 8px; border-radius: 50%; background: #22b857; flex-shrink: 0; }
+    .gc-features { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+    .gc-tag {
+      background: rgba(78,205,196,0.12); border-radius: 999px;
+      padding: 3px 10px; font-size: 0.75rem; font-weight: 600; color: var(--teal);
+    }
+
     /* ── GoatCounter setup ── */
     .setup-steps { list-style: none; counter-reset: step; }
     .setup-steps li {
@@ -164,16 +191,72 @@
     </div>
   </div>
 
+  <!-- GoatCounter — primary analytics -->
+  <div class="card" id="gc-card">
+    <h3>🌐 ניתוח תנועה — כל המשתמשים (GoatCounter)</h3>
+
+    <!-- Connected state (shown when code is saved) -->
+    <div id="gc-connected" style="display:none">
+      <div class="gc-connected">
+        <span class="gc-badge"><span class="gc-dot"></span> GoatCounter מחובר</span>
+        <a id="gc-dash-link" href="#" target="_blank" rel="noopener" class="btn small">📊 פתח לוח בקרה ↗</a>
+        <button class="btn small coral" onclick="disconnectGC()">נתק</button>
+      </div>
+      <div class="gc-features">
+        <span class="gc-tag">🌍 מדינה</span>
+        <span class="gc-tag">📱 מכשיר</span>
+        <span class="gc-tag">🖥 מערכת הפעלה</span>
+        <span class="gc-tag">🌐 דפדפן</span>
+        <span class="gc-tag">🔗 לחיצות על קישורים</span>
+        <span class="gc-tag">📅 לפי שעה ויום</span>
+      </div>
+    </div>
+
+    <!-- Setup state (shown when no code yet) -->
+    <div id="gc-setup">
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:10px">
+        שירות חינמי, ללא עוגיות, ללא כרטיס אשראי. מציג נתונים מכל המשתמשים — מכשיר, מדינה, שעות פעילות, לחיצות.
+      </p>
+      <ol class="setup-steps">
+        <li>
+          <span>
+            גש ל-<a href="https://www.goatcounter.com" target="_blank" rel="noopener" style="color:var(--teal);font-weight:700">goatcounter.com</a>
+            ולחץ <strong>Sign up</strong>.
+          </span>
+        </li>
+        <li>
+          <span>
+            בחר קוד אתר (לדוגמה: <code>hadar-g32</code>) וסיים את ההרשמה.
+          </span>
+        </li>
+        <li>
+          <span>
+            פתח את <code>docs/index.html</code>, מצא <code>YOUR-CODE</code> ושנה לקוד שבחרת.
+            שמור ודחוף ל-GitHub.
+          </span>
+        </li>
+        <li>
+          <span>
+            הזן את הקוד כאן למטה כדי לשמור קישור מהיר ללוח הבקרה.
+          </span>
+        </li>
+      </ol>
+      <div class="gc-code-row" style="margin-top:14px">
+        <input type="text" id="gc-code-input" placeholder="hadar-g32" dir="ltr" autocomplete="off" />
+        <button class="btn small" onclick="saveGCCode()">שמור קוד</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Per-device stats (secondary) -->
   <div class="notice">
-    ⚠️ הסטטיסטיקות האלה נאספות <strong>מהמכשיר הנוכחי בלבד</strong>.
-    לנתונים אמיתיים מכל המשתמשים, הפעל
-    <a href="https://www.goatcounter.com" target="_blank" rel="noopener">GoatCounter</a>
-    (ראה הוראות למטה).
+    📊 הנתונים הבאים נאספים <strong>מהמכשיר הנוכחי בלבד</strong>.
+    לנתונים מכל המשתמשים, השתמש בלוח GoatCounter למעלה.
   </div>
 
   <!-- Stat boxes -->
   <div class="card">
-    <h3>📈 סיכום כללי</h3>
+    <h3>📈 סיכום — המכשיר הזה</h3>
     <div class="stat-grid">
       <div class="stat-box">
         <div class="stat-num" id="stat-total">0</div>
@@ -197,53 +280,20 @@
 
   <!-- Sparkline: last 7 days -->
   <div class="card">
-    <h3>📅 ביקורים ב-7 ימים האחרונים</h3>
+    <h3>📅 ביקורים ב-7 ימים האחרונים (מכשיר זה)</h3>
     <div class="sparkline" id="sparkline"></div>
   </div>
 
   <!-- Hour heatmap -->
   <div class="card">
-    <h3>🕐 שעות פעילות</h3>
+    <h3>🕐 שעות פעילות (מכשיר זה)</h3>
     <div id="hour-chart" style="display:flex;gap:3px;flex-wrap:wrap;margin-top:8px"></div>
   </div>
 
   <!-- Click leaderboard -->
   <div class="card">
-    <h3>🔗 קישורים שנלחצו</h3>
+    <h3>🔗 קישורים שנלחצו (מכשיר זה)</h3>
     <div id="click-list"></div>
-  </div>
-
-  <!-- GoatCounter setup -->
-  <div class="card">
-    <h3>🌐 הגדרת ניתוח תנועה מלא (GoatCounter)</h3>
-    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:12px">
-      שירות חינמי, ללא עוגיות, לסטטיסטיקות מכל המשתמשים.
-    </p>
-    <ol class="setup-steps">
-      <li>
-        <span>
-          גש ל-<a href="https://www.goatcounter.com" target="_blank" rel="noopener" style="color:var(--teal);font-weight:700">goatcounter.com</a>
-          ולחץ <strong>Sign up</strong>.
-        </span>
-      </li>
-      <li>
-        <span>
-          בחר קוד אתר (לדוגמה: <code>hadar-g32</code>) וסיים את ההרשמה.
-        </span>
-      </li>
-      <li>
-        <span>
-          פתח את קובץ <code>docs/index.html</code> ומצא את הבלוק <code>&lt;!-- Analytics --&gt;</code>.
-          הסר את ה-<code>&lt;!--</code> וה-<code>--&gt;</code> ושנה <code>YOUR-CODE</code> לקוד שבחרת.
-        </span>
-      </li>
-      <li>
-        <span>
-          שמור ודחוף ל-GitHub. הנתונים יתחילו להצטבר תוך דקות.
-          לוח הבקרה: <code>hadar-g32.goatcounter.com</code>
-        </span>
-      </li>
-    </ol>
   </div>
 
   <div style="text-align:center;font-size:0.78rem;color:var(--muted);margin-top:8px">
@@ -258,8 +308,41 @@
 const ADMIN_PASS = 'hadar2026';
 // ─────────────────────────────────────────────────────────
 
+// ── GoatCounter code management ───────────────────────────
+function loadGCState() {
+  const code = localStorage.getItem('gc_code');
+  if (code) {
+    document.getElementById('gc-connected').style.display = '';
+    document.getElementById('gc-setup').style.display = 'none';
+    const link = document.getElementById('gc-dash-link');
+    link.href = `https://${code}.goatcounter.com`;
+    link.textContent = `📊 ${code}.goatcounter.com ↗`;
+  } else {
+    document.getElementById('gc-connected').style.display = 'none';
+    document.getElementById('gc-setup').style.display = '';
+  }
+}
+
+function saveGCCode() {
+  const val = document.getElementById('gc-code-input').value.trim().toLowerCase();
+  if (!val) return;
+  localStorage.setItem('gc_code', val);
+  loadGCState();
+}
+
+function disconnectGC() {
+  localStorage.removeItem('gc_code');
+  document.getElementById('gc-code-input').value = '';
+  loadGCState();
+}
+
 document.getElementById('pwd').addEventListener('keydown', e => {
   if (e.key === 'Enter') checkPass();
+});
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('gc-code-input')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') saveGCCode();
+  });
 });
 
 function checkPass() {
@@ -279,6 +362,7 @@ function getAnalytics() {
 }
 
 function loadDash() {
+  loadGCState();
   const data = getAnalytics();
   const visits = data.visits || [];
   const clicks = data.clicks || {};

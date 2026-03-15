@@ -6,6 +6,14 @@ const DAYS     = ['ראשון','שני','שלישי','רביעי','חמישי'];
 const TIMES    = ['10:00','10:30','11:00','12:00','13:00'];
 const SLOT_MINS = [[600,630],[630,660],[660,720],[720,780],[780,810]];
 
+// ── GoatCounter event helper (real multi-device analytics) ─
+// Page views are tracked automatically. This tracks clicks.
+function gcEvent(path, title) {
+  if (window.goatcounter?.count) {
+    window.goatcounter.count({ path: 'click/' + path, title, event: true });
+  }
+}
+
 // ── Analytics (localStorage, per-device) ──────────────────
 
 function trackVisit() {
@@ -98,7 +106,7 @@ function renderTimetable(links, cells) {
         a.href = OFEK_URL; a.target = '_blank'; a.rel = 'noopener noreferrer';
         a.className = 'tt-task-link';
         a.innerHTML = `<span class="tt-task-label">📝 משימה</span><span class="tt-subject">${cell.subject}</span>`;
-        a.addEventListener('click', () => trackClick('📝 ' + cell.subject));
+        a.addEventListener('click', () => { trackClick('📝 ' + cell.subject); gcEvent('task/' + cell.subject, 'Task: ' + cell.subject); });
         td.appendChild(a);
       } else {
         const url = links[cell.teacher];
@@ -109,7 +117,7 @@ function renderTimetable(links, cells) {
           const a = document.createElement('a');
           a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
           a.className = 'tt-link'; a.innerHTML = inner;
-          a.addEventListener('click', () => trackClick(cell.teacher));
+          a.addEventListener('click', () => { trackClick(cell.teacher); gcEvent('lesson/' + cell.teacher, cell.subject + ' — ' + cell.teacher); });
           td.appendChild(a);
         } else {
           td.innerHTML = inner;
@@ -367,7 +375,7 @@ async function init() {
     a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
     a.className = `teacher-btn ${cls}`;
     a.innerHTML = `<span class="btn-icon">${icon}</span><span class="btn-name">${name}</span>`;
-    a.addEventListener('click', () => trackClick(name));
+    a.addEventListener('click', () => { trackClick(name); gcEvent('teacher/' + name, 'Teacher: ' + name); });
     grid.appendChild(a);
   }
 }
