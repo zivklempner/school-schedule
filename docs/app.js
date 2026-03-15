@@ -201,6 +201,39 @@ function updateLive(cells) {
   }
 }
 
+// ── Lesson timer ───────────────────────────────────────────
+
+function updateLessonTimer() {
+  const timer = document.getElementById('lesson-timer');
+  const now     = new Date();
+  const dayOfWeek = now.getDay();
+  const nowSec  = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+
+  if (dayOfWeek > 4) { timer.style.display = 'none'; return; }
+
+  let currentSlot = -1;
+  for (let i = 0; i < SLOT_MINS.length; i++) {
+    const [s, e] = SLOT_MINS[i];
+    if (nowSec >= s * 60 && nowSec < e * 60) { currentSlot = i; break; }
+  }
+
+  if (currentSlot === -1) { timer.style.display = 'none'; return; }
+
+  const [slotStart, slotEnd] = SLOT_MINS[currentSlot];
+  const totalSec   = (slotEnd - slotStart) * 60;
+  const elapsedSec = nowSec - slotStart * 60;
+  const remainSec  = totalSec - elapsedSec;
+  const pct        = Math.min(100, (elapsedSec / totalSec) * 100);
+
+  const remainMin  = Math.ceil(remainSec / 60);
+  const label      = remainMin === 1 ? 'דקה אחת' : `${remainMin} דק׳`;
+
+  document.getElementById('lesson-timer-fill').style.width = pct.toFixed(1) + '%';
+  document.getElementById('lesson-timer-label').textContent = `⏱ נשארו: ${label}`;
+  document.getElementById('lesson-timer-pct').textContent   = Math.round(pct) + '%';
+  timer.style.display = 'flex';
+}
+
 // ── Today-only toggle ──────────────────────────────────────
 
 function setupTodayToggle(autoOn) {
@@ -360,6 +393,9 @@ async function init() {
   renderTimetable(links, cells);
   updateLive(cells);
   setInterval(() => updateLive(cells), 60_000);
+
+  updateLessonTimer();
+  setInterval(updateLessonTimer, 1_000);
 
   const isMobile = window.matchMedia('(max-width: 600px)').matches;
   setupTodayToggle(isMobile);
