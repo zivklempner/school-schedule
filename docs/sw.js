@@ -1,4 +1,4 @@
-const CACHE = 'schedule-v4';
+const CACHE = 'schedule-v5';
 
 self.addEventListener('install', e => {
   // Activate immediately — don't wait for old SW to be idle
