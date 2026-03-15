@@ -126,6 +126,17 @@
     }
     [data-theme="dark"] .gc-badge { background: #1a3533; color: #7de8e0; }
     .gc-dot { width: 8px; height: 8px; border-radius: 50%; background: #22b857; flex-shrink: 0; }
+    .gc-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px; }
+    .gc-tab {
+      background: rgba(78,205,196,0.12); border: 1.5px solid transparent;
+      border-radius: 999px; padding: 5px 14px; font-size: 0.8rem; font-weight: 700;
+      font-family: 'Rubik', sans-serif; color: var(--teal); cursor: pointer;
+      transition: all 0.15s;
+    }
+    .gc-tab:hover { background: rgba(78,205,196,0.25); }
+    .gc-tab.active { background: var(--teal); color: white; }
+    .gc-panel { margin-top: 12px; min-height: 60px; }
+    .gc-token-hint { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
 
     /* ── GoatCounter setup ── */
     .setup-steps { list-style: none; counter-reset: step; }
@@ -194,12 +205,36 @@
     <div id="gc-connected" style="display:none">
       <div class="gc-connected">
         <span class="gc-badge"><span class="gc-dot"></span> GoatCounter מחובר</span>
-        <a id="gc-dash-link" href="#" target="_blank" rel="noopener" class="btn small">📊 פתח לוח בקרה ↗</a>
+        <a id="gc-dash-link" href="#" target="_blank" rel="noopener" class="btn small">↗ פתח ב-GoatCounter</a>
         <button class="btn small coral" onclick="disconnectGC()">נתק</button>
       </div>
-      <p style="font-size:0.82rem;color:var(--muted);margin-top:10px">
-        לוח הבקרה מציג: מדינה · מכשיר · מערכת הפעלה · דפדפן · לחיצות · שעות פעילות
-      </p>
+
+      <!-- API token input — shown until token saved -->
+      <div id="gc-token-setup" style="margin-top:14px">
+        <p style="font-size:0.85rem;color:var(--muted);margin-bottom:8px">
+          להצגת נתונים ישירות כאן, הזן מפתח API מ-GoatCounter:
+        </p>
+        <p class="gc-token-hint">Settings → API keys → צור מפתח חדש (הרשאת קריאה בלבד)</p>
+        <div class="gc-code-row" style="margin-top:8px">
+          <input type="password" id="gc-token-input" placeholder="API token" dir="ltr" autocomplete="off" />
+          <button class="btn small" onclick="saveGCToken()">חבר</button>
+        </div>
+      </div>
+
+      <!-- Tabs + data panel — shown once token is saved -->
+      <div id="gc-data-section" style="display:none">
+        <div class="gc-tabs">
+          <button class="gc-tab active" data-tab="hits">📊 ביקורים</button>
+          <button class="gc-tab" data-tab="locations">🌍 מדינות</button>
+          <button class="gc-tab" data-tab="systems">🖥 מערכת</button>
+          <button class="gc-tab" data-tab="browsers">🌐 דפדפן</button>
+          <button class="gc-tab" data-tab="clicks">🔗 לחיצות</button>
+        </div>
+        <div id="gc-panel" class="gc-panel"></div>
+        <div style="margin-top:10px">
+          <button class="btn small coral" onclick="clearGCToken()" style="font-size:0.72rem;padding:4px 10px">הסר מפתח API</button>
+        </div>
+      </div>
     </div>
 
     <!-- Setup state (shown when no code yet) -->
@@ -298,17 +333,28 @@
 const ADMIN_PASS = 'hadar2026';
 // ─────────────────────────────────────────────────────────
 
-// ── GoatCounter code management ───────────────────────────
+// ── GoatCounter ────────────────────────────────────────────
+let _gcCode = null, _gcToken = null, _gcActiveTab = 'hits', _gcTabsInited = false;
+
 function loadGCState() {
-  const code = localStorage.getItem('gc_code');
+  const code  = localStorage.getItem('gc_code');
+  const token = localStorage.getItem('gc_token');
   const notice = document.getElementById('device-notice');
   if (code) {
+    _gcCode  = code;
+    _gcToken = token;
     document.getElementById('gc-connected').style.display = '';
     document.getElementById('gc-setup').style.display = 'none';
-    const link = document.getElementById('gc-dash-link');
-    link.href = `https://${code}.goatcounter.com`;
-    link.textContent = `📊 ${code}.goatcounter.com ↗`;
+    document.getElementById('gc-dash-link').href = `https://${code}.goatcounter.com`;
     if (notice) notice.style.display = 'none';
+    if (token) {
+      document.getElementById('gc-token-setup').style.display = 'none';
+      document.getElementById('gc-data-section').style.display = '';
+      if (!_gcTabsInited) initGCTabs(); else loadGCTab(_gcActiveTab);
+    } else {
+      document.getElementById('gc-token-setup').style.display = '';
+      document.getElementById('gc-data-section').style.display = 'none';
+    }
   } else {
     document.getElementById('gc-connected').style.display = 'none';
     document.getElementById('gc-setup').style.display = '';
@@ -323,10 +369,125 @@ function saveGCCode() {
   loadGCState();
 }
 
+function saveGCToken() {
+  const val = document.getElementById('gc-token-input').value.trim();
+  if (!val) return;
+  localStorage.setItem('gc_token', val);
+  loadGCState();
+}
+
 function disconnectGC() {
   localStorage.removeItem('gc_code');
+  localStorage.removeItem('gc_token');
+  _gcTabsInited = false;
   document.getElementById('gc-code-input').value = '';
   loadGCState();
+}
+
+function clearGCToken() {
+  localStorage.removeItem('gc_token');
+  _gcTabsInited = false;
+  loadGCState();
+}
+
+// ── GoatCounter API tabs ────────────────────────────────────
+async function gcAPI(path) {
+  const end   = new Date().toISOString().slice(0, 10);
+  const start = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+  const sep   = path.includes('?') ? '&' : '?';
+  const url   = `https://${_gcCode}.goatcounter.com/api/v0/${path}${sep}start=${start}&end=${end}&limit=20`;
+  const r = await fetch(url, { headers: { Authorization: `Bearer ${_gcToken}` } });
+  if (!r.ok) throw new Error(String(r.status));
+  return r.json();
+}
+
+function initGCTabs() {
+  _gcTabsInited = true;
+  document.querySelectorAll('.gc-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.gc-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      _gcActiveTab = btn.dataset.tab;
+      loadGCTab(_gcActiveTab);
+    });
+  });
+  loadGCTab(_gcActiveTab);
+}
+
+async function loadGCTab(tab) {
+  const panel = document.getElementById('gc-panel');
+  panel.innerHTML = '<div class="no-data">טוען…</div>';
+  try {
+    switch (tab) {
+      case 'hits': {
+        const d = await gcAPI('stats/hits');
+        renderGCHits(d, panel);
+        break;
+      }
+      case 'locations': {
+        const d = await gcAPI('stats/locations');
+        renderGCBars((d.locations || []).map(x => ({ name: x.id || 'לא ידוע', count: x.count, pct: x.count_pct })), panel);
+        break;
+      }
+      case 'systems': {
+        const d = await gcAPI('stats/systems');
+        renderGCBars((d.systems || []).map(x => ({ name: x.name || x.id || 'לא ידוע', count: x.count, pct: x.count_pct })), panel);
+        break;
+      }
+      case 'browsers': {
+        const d = await gcAPI('stats/browsers');
+        renderGCBars((d.browsers || []).map(x => ({ name: x.name || x.id || 'לא ידוע', count: x.count, pct: x.count_pct })), panel);
+        break;
+      }
+      case 'clicks': {
+        const d = await gcAPI('hits');
+        const items = (d.hits || [])
+          .filter(h => h.event === true)
+          .map(h => ({ name: (h.path || '').replace(/^click\//, ''), count: h.count_unique ?? h.count }))
+          .filter(h => h.name);
+        renderGCBars(items, panel);
+        break;
+      }
+    }
+  } catch (e) {
+    const msg = e.message === '403' ? 'מפתח API שגוי או חסר הרשאות קריאה'
+              : e.message === '401' ? 'מפתח API לא תקין'
+              : `שגיאה (${e.message})`;
+    panel.innerHTML = `<div class="no-data" style="color:#c00">${msg}</div>`;
+  }
+}
+
+function renderGCHits(data, panel) {
+  const hits  = data.hits || [];
+  const total = hits.reduce((s, d) => s + d.count, 0);
+  const max   = Math.max(...hits.map(d => d.count), 1);
+  panel.innerHTML = `
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="font-size:2.2rem;font-weight:900;color:var(--teal);line-height:1">${total.toLocaleString()}</div>
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:2px">ביקורים ב-30 יום האחרונים</div>
+    </div>
+    <div class="sparkline" style="height:80px">
+      ${hits.map(d => {
+        const h    = Math.max((d.count / max) * 72, d.count > 0 ? 3 : 1);
+        const date = new Date(d.day + 'T12:00:00');
+        const lbl  = `${date.getDate()}/${date.getMonth() + 1}`;
+        return `<div class="spark-bar-wrap" title="${d.day}: ${d.count}">
+          <div class="spark-bar" style="height:${h}px"></div>
+          <div class="spark-label">${lbl}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+}
+
+function renderGCBars(items, panel) {
+  if (!items.length) { panel.innerHTML = '<div class="no-data">אין נתונים</div>'; return; }
+  const max = Math.max(...items.map(x => x.count), 1);
+  panel.innerHTML = items.map(item => `
+    <div class="click-row">
+      <span class="click-name">${item.name}</span>
+      <span class="click-count">${item.count}${item.pct != null ? ` <span style="font-size:0.7rem;opacity:0.6">${Math.round(item.pct)}%</span>` : ''}</span>
+      <div class="click-bar-bg"><div class="click-bar-fill" style="width:${(item.count / max * 100).toFixed(0)}%"></div></div>
+    </div>`).join('');
 }
 
 document.getElementById('pwd').addEventListener('keydown', e => {
@@ -335,6 +496,9 @@ document.getElementById('pwd').addEventListener('keydown', e => {
 document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('gc-code-input')?.addEventListener('keydown', e => {
     if (e.key === 'Enter') saveGCCode();
+  });
+  document.getElementById('gc-token-input')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') saveGCToken();
   });
 });
 
