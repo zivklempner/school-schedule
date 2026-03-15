@@ -502,10 +502,21 @@ async function init() {
   setupShare();
   setupInstallBanner();
 
+  // Collect every teacher that appears in any week's schedule
+  const scheduledTeachers = new Set();
+  for (const w of scheduleData.weeks) {
+    for (const row of w.cells) {
+      for (const cell of row) {
+        if (cell?.teacher) scheduledTeachers.add(cell.teacher);
+      }
+    }
+  }
+
   const grid = document.getElementById('teachers-grid');
   grid.innerHTML = '';
   for (const [name, url] of Object.entries(links)) {
     if (!url) continue;
+    if (!scheduledTeachers.has(name)) continue;
     const { cls, icon } = classifyLink(url);
     const a = document.createElement('a');
     a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
