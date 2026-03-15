@@ -169,8 +169,7 @@ function updateLive(cells) {
     const c = cells[currentSlot]?.[dayOfWeek];
     if (c) {
       const label = c.task ? `📝 ${c.subject}` : c.subject;
-      const rem   = SLOT_MINS[currentSlot][1] - nowMin;
-      nowPill.textContent  = `🟢 עכשיו: ${label} (עוד ${rem} דק׳)`;
+      nowPill.textContent  = `🟢 עכשיו: ${label}`;
       nowPill.style.display = '';
     } else {
       nowPill.style.display = 'none';
