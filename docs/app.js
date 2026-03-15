@@ -1,12 +1,12 @@
 const HEBREW_MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
-const OFEK_URL = 'https://myofek.cet.ac.il/';
+const OFEK_URL  = 'https://myofek.cet.ac.il/';
+const SHARE_URL = 'https://tinyurl.com/25qzaruv';
 
 const DAYS  = ['ראשון','שני','שלישי','רביעי','חמישי'];
 const TIMES = ['10:00','10:30','11:00','12:00','13:00'];
-// [start, end] in minutes from midnight
 const SLOT_MINS = [[600,630],[630,660],[660,720],[720,780],[780,810]];
 
-// ── Helpers ────────────────────────────────────────────────────────────
+// ── Helpers ────────────────────────────────────────────────
 
 function parseLocalDate(str) {
   const [y, m, d] = str.split('-').map(Number);
@@ -18,10 +18,9 @@ function findCurrentWeek(weeks) {
   const sorted = [...weeks].sort((a,b) => parseLocalDate(a.start) - parseLocalDate(b.start));
   for (const w of sorted) {
     const start = parseLocalDate(w.start);
-    const end   = new Date(start); end.setDate(start.getDate() + 7);
+    const end = new Date(start); end.setDate(start.getDate() + 7);
     if (today >= start && today < end) return w;
   }
-  // Fallback: most recent past week, or first future
   const past = sorted.filter(w => parseLocalDate(w.start) <= today);
   return past.length ? past[past.length - 1] : sorted[0];
 }
@@ -33,13 +32,12 @@ function classifyLink(url) {
   return { cls: 'zoom', icon: '🔗' };
 }
 
-// ── Timetable renderer ─────────────────────────────────────────────────
+// ── Timetable renderer ─────────────────────────────────────
 
 function renderTimetable(links, cells) {
   const table = document.getElementById('timetable');
   table.innerHTML = '';
 
-  // Header
   const thead = table.createTHead();
   const headerRow = thead.insertRow();
   const corner = document.createElement('th');
@@ -53,7 +51,6 @@ function renderTimetable(links, cells) {
     headerRow.appendChild(th);
   });
 
-  // Body
   const tbody = table.createTBody();
   cells.forEach((row, ti) => {
     const tr = tbody.insertRow();
@@ -97,7 +94,9 @@ function renderTimetable(links, cells) {
   });
 }
 
-// ── Live: today highlight + now row + countdown ────────────────────────
+// ── Live indicator (fixed) ─────────────────────────────────
+// "current" = any slot we're in (task or live)
+// "next"    = next LIVE (non-task) slot only — tasks don't need joining
 
 function updateLive(cells) {
   const now       = new Date();
@@ -105,10 +104,7 @@ function updateLive(cells) {
   const nowMin    = now.getHours() * 60 + now.getMinutes();
   const pill      = document.getElementById('next-lesson');
 
-  // Clear previous now-row
   document.querySelectorAll('tr.tt-now').forEach(el => el.classList.remove('tt-now'));
-
-  // Mark today's column
   document.querySelectorAll('[data-day]').forEach(el =>
     el.classList.toggle('tt-today', parseInt(el.dataset.day) === dayOfWeek)
   );
@@ -118,50 +114,97 @@ function updateLive(cells) {
     return;
   }
 
-  let currentSlot = -1, nextSlot = -1;
+  let currentSlot  = -1;
+  let nextLiveSlot = -1; // skip tasks — only slots with a real teacher
+
   for (let i = 0; i < SLOT_MINS.length; i++) {
-    if (nowMin >= SLOT_MINS[i][0] && nowMin < SLOT_MINS[i][1]) { currentSlot = i; break; }
-    if (nowMin < SLOT_MINS[i][0] && nextSlot === -1) nextSlot = i;
+    const [s, e] = SLOT_MINS[i];
+    if (nowMin >= s && nowMin < e) {
+      currentSlot = i;
+    } else if (nowMin < s && nextLiveSlot === -1) {
+      const c = cells[i]?.[dayOfWeek];
+      if (c && !c.task) nextLiveSlot = i; // only count live lessons as "next"
+    }
   }
 
-  const cellLabel = idx => {
+  // Label for a cell: show actual subject even for tasks (not the generic word)
+  const slotLabel = (idx) => {
     const c = cells[idx]?.[dayOfWeek];
     if (!c) return null;
-    return c.task ? 'משימה עצמאית' : c.subject;
+    return c.task ? `📝 ${c.subject}` : c.subject;
   };
 
   if (currentSlot !== -1) {
     const rows = document.querySelectorAll('#timetable tbody tr');
     rows[currentSlot]?.classList.add('tt-now');
     const rem = SLOT_MINS[currentSlot][1] - nowMin;
-    const lbl = cellLabel(currentSlot);
-    pill.textContent = lbl ? `⏱ ${lbl} — עוד ${rem} דק׳` : `⏱ שיעור פעיל — עוד ${rem} דק׳`;
-  } else if (nextSlot !== -1) {
-    const min = SLOT_MINS[nextSlot][0] - nowMin;
-    const lbl = cellLabel(nextSlot);
-    pill.textContent = lbl ? `🔔 הבא: ${lbl} — בעוד ${min} דק׳` : `🔔 השיעור הבא בעוד ${min} דק׳`;
+    const lbl = slotLabel(currentSlot);
+    pill.textContent = lbl ? `⏱ ${lbl} — עוד ${rem} דק׳` : `⏱ עוד ${rem} דק׳`;
+  } else if (nextLiveSlot !== -1) {
+    const min = SLOT_MINS[nextLiveSlot][0] - nowMin;
+    const c   = cells[nextLiveSlot][dayOfWeek];
+    pill.textContent = `🔔 הבא: ${c.subject} — בעוד ${min} דק׳`;
   } else if (nowMin < SLOT_MINS[0][0]) {
-    pill.textContent = `🌅 השיעורים מתחילים ב-10:00`;
+    pill.textContent = '🌅 השיעורים מתחילים ב-10:00';
   } else {
     pill.textContent = '🎉 כל השיעורים הסתיימו!';
   }
 }
 
-// ── Today-only toggle ──────────────────────────────────────────────────
+// ── Today-only toggle ──────────────────────────────────────
 
-function setupTodayToggle() {
+function setupTodayToggle(autoOn) {
   const btn   = document.getElementById('today-toggle');
   const table = document.getElementById('timetable');
-  btn.addEventListener('click', () => {
+
+  const setOn = (on) => {
     const hasToday = table.querySelector('[data-day].tt-today');
-    if (!hasToday) return; // weekend — nothing to filter
-    const on = table.classList.toggle('today-only');
+    if (on && !hasToday) return; // weekend — nothing to filter
+    table.classList.toggle('today-only', on);
     btn.textContent = on ? '📅 כל הימים' : '📍 היום בלבד';
     btn.classList.toggle('active', on);
+  };
+
+  if (autoOn) setOn(true);
+
+  btn.addEventListener('click', () => setOn(!table.classList.contains('today-only')));
+}
+
+// ── Share / TinyURL ────────────────────────────────────────
+
+function setupShare() {
+  const btn = document.getElementById('share-btn');
+  btn.addEventListener('click', async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'מערכת ג׳2 — צוות הדר', url: SHARE_URL });
+        return;
+      } catch { /* user cancelled */ }
+    }
+    // Fallback: copy to clipboard
+    try {
+      await navigator.clipboard.writeText(SHARE_URL);
+      showToast('הקישור הועתק! ' + SHARE_URL);
+    } catch {
+      showToast(SHARE_URL);
+    }
   });
 }
 
-// ── Notifications ──────────────────────────────────────────────────────
+function showToast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'toast';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── Notifications ──────────────────────────────────────────
 
 let _swReg = null;
 let _notificationsScheduled = false;
@@ -173,15 +216,15 @@ async function setupNotifications(cells) {
   const refresh = () => {
     const p = Notification.permission;
     if (p === 'granted') {
-      btn.textContent = '🔔 התראות פעילות';
+      btn.title = 'התראות פעילות';
       btn.classList.add('notify-active');
-      btn.style.display = 'inline-block';
+      btn.style.display = 'flex';
       if (!_notificationsScheduled) scheduleNotifications(cells);
     } else if (p === 'denied') {
       btn.style.display = 'none';
     } else {
-      btn.textContent = '🔔 הפעל התראות';
-      btn.style.display = 'inline-block';
+      btn.title = 'הפעל התראות';
+      btn.style.display = 'flex';
     }
   };
 
@@ -195,27 +238,23 @@ async function setupNotifications(cells) {
 
 function scheduleNotifications(cells) {
   _notificationsScheduled = true;
-  const now       = new Date();
-  const dayOfWeek = now.getDay();
-  if (dayOfWeek > 4) return;
+  const now = new Date();
+  const day = now.getDay();
+  if (day > 4) return;
   const nowMin = now.getHours() * 60 + now.getMinutes();
 
   SLOT_MINS.forEach(([start], si) => {
-    const notifyMin = start - 5;
-    const msUntil   = (notifyMin - nowMin) * 60_000;
+    const msUntil = (start - 5 - nowMin) * 60_000;
     if (msUntil <= 0) return;
-
-    const cell = cells[si]?.[dayOfWeek];
+    const cell = cells[si]?.[day];
     if (!cell) return;
-    const label   = cell.task ? `משימה — ${cell.subject}` : cell.subject;
+    const label   = cell.task ? `📝 ${cell.subject}` : cell.subject;
     const teacher = cell.teacher ? ` עם ${cell.teacher.split(' ')[0]}` : '';
-    const body    = `${TIMES[si]} — ${label}${teacher}`;
-
     setTimeout(() => {
       if (Notification.permission !== 'granted') return;
-      // Prefer service worker notification (works when page is in background)
-      if (_swReg) {
-        _swReg.active?.postMessage({ type: 'NOTIFY', title: '🔔 שיעור בעוד 5 דקות', body, tag: `lesson-${si}` });
+      const body = `${TIMES[si]} — ${label}${teacher}`;
+      if (_swReg?.active) {
+        _swReg.active.postMessage({ type: 'NOTIFY', title: '🔔 שיעור בעוד 5 דקות', body, tag: `lesson-${si}` });
       } else {
         new Notification('🔔 שיעור בעוד 5 דקות', { body, icon: 'favicon.svg', tag: `lesson-${si}` });
       }
@@ -223,44 +262,37 @@ function scheduleNotifications(cells) {
   });
 }
 
-// ── Dark mode ──────────────────────────────────────────────────────────
+// ── Dark mode ──────────────────────────────────────────────
 
 function initDarkMode() {
   const btn = document.getElementById('dark-toggle');
-  const stored     = localStorage.getItem('theme');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const dark = stored ? stored === 'dark' : prefersDark;
+  const stored = localStorage.getItem('theme');
+  const dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
   if (dark) document.documentElement.dataset.theme = 'dark';
   btn.textContent = dark ? '☀️' : '🌙';
 
   btn.addEventListener('click', () => {
     const isDark = document.documentElement.dataset.theme === 'dark';
-    if (isDark) {
-      delete document.documentElement.dataset.theme;
-      localStorage.setItem('theme', 'light');
-      btn.textContent = '🌙';
-    } else {
-      document.documentElement.dataset.theme = 'dark';
-      localStorage.setItem('theme', 'dark');
-      btn.textContent = '☀️';
-    }
+    delete document.documentElement.dataset.theme;
+    if (!isDark) document.documentElement.dataset.theme = 'dark';
+    localStorage.setItem('theme', isDark ? 'light' : 'dark');
+    btn.textContent = isDark ? '🌙' : '☀️';
   });
 }
 
-// ── Service worker ─────────────────────────────────────────────────────
+// ── Service worker ─────────────────────────────────────────
 
 async function registerSW() {
   if (!('serviceWorker' in navigator)) return;
   try {
     _swReg = await navigator.serviceWorker.register('./sw.js');
-    // When a new SW takes over (after a deploy), reload once to get fresh files
     navigator.serviceWorker.addEventListener('controllerchange', () => window.location.reload());
   } catch (e) {
     console.warn('SW registration failed', e);
   }
 }
 
-// ── Bootstrap ──────────────────────────────────────────────────────────
+// ── Bootstrap ──────────────────────────────────────────────
 
 async function init() {
   initDarkMode();
@@ -281,7 +313,6 @@ async function init() {
   const week  = findCurrentWeek(scheduleData.weeks);
   const cells = week.cells;
 
-  // Week range label from schedule data
   const wStart = parseLocalDate(week.start);
   const wEnd   = new Date(wStart); wEnd.setDate(wStart.getDate() + 4);
   const fmt = d => `${d.getDate()} ${HEBREW_MONTHS[d.getMonth()]}`;
@@ -291,10 +322,13 @@ async function init() {
   renderTimetable(links, cells);
   updateLive(cells);
   setInterval(() => updateLive(cells), 60_000);
-  setupTodayToggle();
-  setupNotifications(cells);
 
-  // Teachers grid
+  // Auto today-only on narrow screens
+  const isMobile = window.matchMedia('(max-width: 600px)').matches;
+  setupTodayToggle(isMobile);
+  setupNotifications(cells);
+  setupShare();
+
   const grid = document.getElementById('teachers-grid');
   grid.innerHTML = '';
   for (const [name, url] of Object.entries(links)) {

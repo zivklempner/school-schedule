@@ -2,58 +2,81 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>מערכת למידה מרחוק — כיתה ג׳2</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>מערכת ג׳2 — צוות הדר</title>
+
+  <!-- Favicon & PWA -->
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="favicon.svg" />
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#4ECDC4" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="מערכת ג׳2" />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!-- Social -->
+  <meta property="og:title" content="מערכת למידה מרחוק — כיתה ג׳2" />
+  <meta property="og:description" content="מערכת שעות ולינקים לשיעורים — כיתה ג׳2 צוות הדר" />
+
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="page-wrapper">
+
+    <!-- ── Header ── -->
     <header class="header-card">
-      <button class="dark-toggle" id="dark-toggle" title="מצב כהה / בהיר">🌙</button>
-      <span class="deco-top">🌸 🌈 🌼</span>
+      <div class="header-top-row">
+        <button class="icon-btn" id="dark-toggle" title="מצב כהה / בהיר" aria-label="החלף ערכת נושא">🌙</button>
+        <span class="deco-top" aria-hidden="true">🌸 🌈 🌼</span>
+        <div class="header-top-actions">
+          <button class="icon-btn notify-btn" id="notify-btn" style="display:none" title="התראות" aria-label="הפעל התראות">🔔</button>
+          <button class="icon-btn" id="share-btn" title="שתף קישור" aria-label="שתף קישור">📤</button>
+        </div>
+      </div>
       <h1>מערכת למידה מרחוק</h1>
       <div class="subtitle">כיתה ג׳2 — צוות הדר</div>
       <div class="header-meta">
-        <div class="week-range" id="week-range">…</div>
-        <div class="next-lesson-pill" id="next-lesson">טוען…</div>
-        <button class="notify-btn" id="notify-btn" style="display:none">🔔 הפעל התראות</button>
+        <span class="week-range" id="week-range">…</span>
+        <span class="next-lesson-pill" id="next-lesson">טוען…</span>
       </div>
     </header>
 
+    <!-- ── Schedule ── -->
     <section class="schedule-card">
       <div class="schedule-card-header">
-        <h2>📅 מערכת השעות השבועית</h2>
-        <div class="schedule-card-actions">
-          <button class="today-toggle-btn" id="today-toggle">📍 היום בלבד</button>
-          <button class="print-btn" onclick="window.print()">🖨️ הדפס / PDF</button>
+        <h2>📅 מערכת השעות</h2>
+        <div class="schedule-actions">
+          <button class="action-btn teal-btn" id="today-toggle">📍 היום</button>
+          <button class="action-btn coral-btn" onclick="window.print()" aria-label="הדפס">🖨️</button>
         </div>
       </div>
       <div class="tt-legend">
         <span class="legend-item legend-zoom">🎥 Zoom</span>
-        <span class="legend-item legend-meet">📹 Google Meet</span>
-        <span class="legend-item legend-task">📝 משימה עצמאית</span>
+        <span class="legend-item legend-meet">📹 Meet</span>
+        <span class="legend-item legend-task">📝 משימה</span>
       </div>
-      <p class="schedule-caption">לחצו על שיעור כדי להצטרף ישירות</p>
+      <p class="schedule-caption">לחצו על שיעור להצטרפות</p>
       <div class="timetable-wrap">
         <table class="timetable" id="timetable"></table>
       </div>
     </section>
 
+    <!-- ── Teachers ── -->
     <section class="teachers-card">
       <h2>🔗 כל הקישורים</h2>
       <div class="teachers-grid" id="teachers-grid">
-        <p style="text-align:center;color:#888">טוען קישורים…</p>
+        <p class="loading-msg">טוען קישורים…</p>
       </div>
     </section>
 
     <footer>
       <span>🌸</span> לעדכונים פנו למחנכת הכיתה <span>🌸</span>
+      <div class="footer-url">
+        <a href="https://tinyurl.com/25qzaruv" target="_blank" rel="noopener">tinyurl.com/25qzaruv</a>
+      </div>
     </footer>
+
   </div>
   <script src="app.js"></script>
 </body>
