@@ -1,13 +1,14 @@
 const HEBREW_MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+const OFEK_URL = 'https://myofek.cet.ac.il/';
 
-// Schedule data parsed from the weekly image
-// days: ראשון=0 … חמישי=4  |  cells[timeIdx][dayIdx]
 const DAYS = ['ראשון','שני','שלישי','רביעי','חמישי'];
 const TIMES = ['10:00','10:30','11:00','12:00','13:00'];
+// [start, end] in minutes from midnight
+const SLOT_MINS = [[600,630],[630,660],[660,720],[720,780],[780,810]];
 
 // teacher: exact key from links.json | task:true = independent assignment | null = empty
 const CELLS = [
-  // ── 10:00 ──────────────────────────────────────────────────────────
+  // ── 10:00 ─────────────────────────────────────────────────────────
   [
     { subject: 'רגשי',      teacher: 'רפית טסה'  },
     { subject: 'מתמטיקה',   teacher: 'רפית טסה'  },
@@ -15,31 +16,31 @@ const CELLS = [
     { subject: 'שפה',       teacher: 'אילת יוסף' },
     { subject: 'רגשי',      teacher: 'רפית טסה'  },
   ],
-  // ── 10:30 ──────────────────────────────────────────────────────────
+  // ── 10:30 ─────────────────────────────────────────────────────────
   [
-    { subject: 'מתמטיקה',         teacher: 'רפית טסה'  },
-    { subject: 'אומנות / אנגלית', task: true            },
-    { subject: 'מתמטיקה',         teacher: 'רפית טסה'  },
-    { subject: 'מדעים אופק',      task: true            },
-    { subject: 'שפה / מתמטיקה',   task: true            },
+    { subject: 'מתמטיקה',         teacher: 'רפית טסה' },
+    { subject: 'אומנות / אנגלית', task: true           },
+    { subject: 'מתמטיקה',         teacher: 'רפית טסה' },
+    { subject: 'מדעים אופק',      task: true           },
+    { subject: 'שפה / מתמטיקה',   task: true           },
   ],
-  // ── 11:00 ──────────────────────────────────────────────────────────
+  // ── 11:00 ─────────────────────────────────────────────────────────
   [
-    { subject: 'מתמטיקה',   task: true             },
-    { subject: 'שפה',        teacher: 'אילת יוסף'  },
-    { subject: 'שפה / ספורט', task: true            },
-    { subject: 'מדעים',      teacher: 'רפית טסה'   },
-    { subject: 'ספורט',      teacher: 'נתנאל מדעי' },
+    { subject: 'מתמטיקה',    task: true             },
+    { subject: 'שפה',         teacher: 'אילת יוסף'  },
+    { subject: 'שפה / ספורט', task: true             },
+    { subject: 'מדעים',       teacher: 'רפית טסה'   },
+    { subject: 'ספורט',       teacher: 'נתנאל מדעי' },
   ],
-  // ── 12:00 ──────────────────────────────────────────────────────────
+  // ── 12:00 ─────────────────────────────────────────────────────────
   [
-    { subject: 'ספורט',         teacher: 'אוראל עטייה'     },
-    { subject: 'מיינדפולנס',    teacher: 'הגר מיינדפולנס'  },
-    { subject: 'מוסיקה',        teacher: 'סופייה משייב'    },
-    { subject: 'אנגלית',        teacher: 'כלנית רז שטראוס' },
+    { subject: 'ספורט',        teacher: 'אוראל עטייה'     },
+    { subject: 'מיינדפולנס',   teacher: 'הגר מיינדפולנס'  },
+    { subject: 'מוסיקה',       teacher: 'סופייה משייב'    },
+    { subject: 'אנגלית',       teacher: 'כלנית רז שטראוס' },
     { subject: 'אומנות שכבתי', teacher: 'רווית מזרחי'     },
   ],
-  // ── 13:00 ──────────────────────────────────────────────────────────
+  // ── 13:00 ─────────────────────────────────────────────────────────
   [
     null,
     null,
@@ -70,34 +71,35 @@ function classifyLink(url) {
 
 function renderTimetable(links) {
   const table = document.getElementById('timetable');
-
-  // Header row
   const thead = table.createTHead();
   const headerRow = thead.insertRow();
-  // Time column header (empty corner)
+
   const cornerTh = document.createElement('th');
   cornerTh.className = 'tt-corner';
   headerRow.appendChild(cornerTh);
-  for (const day of DAYS) {
+
+  DAYS.forEach((day, dayIdx) => {
     const th = document.createElement('th');
     th.className = 'tt-day-header';
+    th.dataset.day = dayIdx;
     th.textContent = day;
     headerRow.appendChild(th);
-  }
+  });
 
-  // Body rows
   const tbody = table.createTBody();
   CELLS.forEach((row, timeIdx) => {
     const tr = tbody.insertRow();
-    // Time label cell
+    tr.dataset.slot = timeIdx;
+
     const timeTd = document.createElement('td');
     timeTd.className = 'tt-time';
     timeTd.textContent = TIMES[timeIdx];
     tr.appendChild(timeTd);
 
-    row.forEach((cell) => {
+    row.forEach((cell, dayIdx) => {
       const td = document.createElement('td');
       td.className = 'tt-cell';
+      td.dataset.day = dayIdx;
 
       if (!cell) {
         td.classList.add('tt-empty');
@@ -107,26 +109,30 @@ function renderTimetable(links) {
 
       if (cell.task) {
         td.classList.add('tt-task');
-        td.innerHTML = `<span class="tt-task-label">משימה</span><span class="tt-subject">${cell.subject}</span>`;
+        const a = document.createElement('a');
+        a.href = OFEK_URL;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.className = 'tt-task-link';
+        a.innerHTML = `<span class="tt-task-label">📝 משימה</span><span class="tt-subject">${cell.subject}</span>`;
+        td.appendChild(a);
         tr.appendChild(td);
         return;
       }
 
-      // Zoom / Meet lesson
       const url = links[cell.teacher];
       const { cls, icon } = url ? classifyLink(url) : { cls: 'zoom', icon: '🎥' };
       td.classList.add('tt-lesson', `tt-${cls}`);
 
+      const inner = `<span class="tt-icon">${icon}</span><span class="tt-teacher">${cell.teacher.split(' ')[0]}</span><span class="tt-subject">${cell.subject}</span>`;
       if (url) {
         const a = document.createElement('a');
-        a.href = url;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
+        a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
         a.className = 'tt-link';
-        a.innerHTML = `<span class="tt-icon">${icon}</span><span class="tt-teacher">${cell.teacher.split(' ')[0]}</span><span class="tt-subject">${cell.subject}</span>`;
+        a.innerHTML = inner;
         td.appendChild(a);
       } else {
-        td.innerHTML = `<span class="tt-icon">${icon}</span><span class="tt-teacher">${cell.teacher.split(' ')[0]}</span><span class="tt-subject">${cell.subject}</span>`;
+        td.innerHTML = inner;
       }
 
       tr.appendChild(td);
@@ -134,8 +140,86 @@ function renderTimetable(links) {
   });
 }
 
+function updateLive() {
+  const now = new Date();
+  const dayOfWeek = now.getDay(); // 0=Sun … 6=Sat
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const pill = document.getElementById('next-lesson');
+
+  // Clear previous live highlights
+  document.querySelectorAll('tr.tt-now').forEach(el => el.classList.remove('tt-now'));
+
+  // Today column highlight
+  document.querySelectorAll('[data-day]').forEach(el => {
+    el.classList.toggle('tt-today', parseInt(el.dataset.day) === dayOfWeek);
+  });
+
+  if (dayOfWeek > 4) {
+    pill.textContent = '🌟 סוף שבוע — נתראה ביום ראשון!';
+    return;
+  }
+
+  // Find current / next slot
+  let currentSlot = -1;
+  let nextSlot = -1;
+  for (let i = 0; i < SLOT_MINS.length; i++) {
+    if (nowMin >= SLOT_MINS[i][0] && nowMin < SLOT_MINS[i][1]) { currentSlot = i; break; }
+    if (nowMin < SLOT_MINS[i][0] && nextSlot === -1) nextSlot = i;
+  }
+
+  const cellLabel = (slotIdx) => {
+    const c = CELLS[slotIdx][dayOfWeek];
+    if (!c) return null;
+    return c.task ? 'משימה עצמאית' : c.subject;
+  };
+
+  if (currentSlot !== -1) {
+    // Highlight current row
+    const rows = document.querySelectorAll('#timetable tbody tr');
+    if (rows[currentSlot]) rows[currentSlot].classList.add('tt-now');
+    const remaining = SLOT_MINS[currentSlot][1] - nowMin;
+    const label = cellLabel(currentSlot);
+    pill.textContent = label
+      ? `⏱ ${label} — עוד ${remaining} דק׳`
+      : `⏱ שיעור פעיל — עוד ${remaining} דק׳`;
+  } else if (nextSlot !== -1) {
+    const minsUntil = SLOT_MINS[nextSlot][0] - nowMin;
+    const label = cellLabel(nextSlot);
+    pill.textContent = label
+      ? `🔔 הבא: ${label} — בעוד ${minsUntil} דק׳`
+      : `🔔 השיעור הבא בעוד ${minsUntil} דק׳`;
+  } else if (nowMin < SLOT_MINS[0][0]) {
+    pill.textContent = `🌅 השיעורים מתחילים ב-10:00`;
+  } else {
+    pill.textContent = '🎉 כל השיעורים הסתיימו!';
+  }
+}
+
+function initDarkMode() {
+  const btn = document.getElementById('dark-toggle');
+  const stored = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const dark = stored ? stored === 'dark' : prefersDark;
+  if (dark) document.documentElement.dataset.theme = 'dark';
+  btn.textContent = dark ? '☀️' : '🌙';
+
+  btn.addEventListener('click', () => {
+    const isDark = document.documentElement.dataset.theme === 'dark';
+    if (isDark) {
+      delete document.documentElement.dataset.theme;
+      localStorage.setItem('theme', 'light');
+      btn.textContent = '🌙';
+    } else {
+      document.documentElement.dataset.theme = 'dark';
+      localStorage.setItem('theme', 'dark');
+      btn.textContent = '☀️';
+    }
+  });
+}
+
 async function init() {
   document.getElementById('week-range').textContent = currentWeekRange();
+  initDarkMode();
 
   let links;
   try {
@@ -143,11 +227,14 @@ async function init() {
     if (!res.ok) throw new Error();
     links = await res.json();
   } catch {
-    document.getElementById('teachers-grid').innerHTML = '<p style="color:#c00;text-align:center">שגיאה בטעינת הקישורים.</p>';
+    document.getElementById('teachers-grid').innerHTML =
+      '<p style="color:#c00;text-align:center">שגיאה בטעינת הקישורים.</p>';
     return;
   }
 
   renderTimetable(links);
+  updateLive();
+  setInterval(updateLive, 60_000);
 
   const grid = document.getElementById('teachers-grid');
   grid.innerHTML = '';

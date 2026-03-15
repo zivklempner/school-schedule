@@ -9,13 +9,20 @@
 <body>
   <div class="page-wrapper">
     <header class="header-card">
+      <button class="dark-toggle" id="dark-toggle" title="מצב כהה / בהיר">🌙</button>
       <span class="deco-top">🌸 🌈 🌼</span>
       <h1>מערכת למידה מרחוק</h1>
       <div class="subtitle">כיתה ג׳2 — צוות הדר</div>
-      <div class="week-range" id="week-range">…</div>
+      <div class="header-meta">
+        <div class="week-range" id="week-range">…</div>
+        <div class="next-lesson-pill" id="next-lesson">טוען…</div>
+      </div>
     </header>
     <section class="schedule-card">
-      <h2>📅 מערכת השעות השבועית</h2>
+      <div class="schedule-card-header">
+        <h2>📅 מערכת השעות השבועית</h2>
+        <button class="print-btn" onclick="window.print()">🖨️ הדפס / PDF</button>
+      </div>
       <div class="tt-legend">
         <span class="legend-item legend-zoom">🎥 Zoom</span>
         <span class="legend-item legend-meet">📹 Google Meet</span>
