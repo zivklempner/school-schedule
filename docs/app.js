@@ -253,6 +253,8 @@ async function registerSW() {
   if (!('serviceWorker' in navigator)) return;
   try {
     _swReg = await navigator.serviceWorker.register('./sw.js');
+    // When a new SW takes over (after a deploy), reload once to get fresh files
+    navigator.serviceWorker.addEventListener('controllerchange', () => window.location.reload());
   } catch (e) {
     console.warn('SW registration failed', e);
   }
