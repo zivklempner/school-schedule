@@ -1,0 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream: #FFF8F0; --coral: #FF6B6B; --teal: #4ECDC4;
+  --orange: #FFB347; --mint: #A8E6CF;
+  --shadow: 0 4px 16px rgba(0,0,0,0.12); --radius: 18px;
+}
+
+body {
+  font-family: 'Rubik', sans-serif;
+  direction: rtl;
+  min-height: 100vh;
+  background-color: #d4f5e9;
+  background-image:
+    linear-gradient(45deg, #b2e8d4 25%, transparent 25%),
+    linear-gradient(-45deg, #b2e8d4 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #b2e8d4 75%),
+    linear-gradient(-45deg, transparent 75%, #b2e8d4 75%);
+  background-size: 40px 40px;
+  background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
+  padding: 20px 16px 40px;
+}
+
+.page-wrapper { max-width: 900px; margin: 0 auto; }
+
+.header-card {
+  background: var(--cream); border-radius: var(--radius);
+  box-shadow: var(--shadow); text-align: center;
+  padding: 28px 24px 20px; margin-bottom: 22px;
+  position: relative; overflow: hidden;
+}
+.header-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px;
+  background: linear-gradient(90deg, var(--coral), var(--orange), var(--teal), var(--mint));
+}
+.deco-top { font-size: 2rem; letter-spacing: 12px; margin-bottom: 8px; display: block; }
+h1 { font-size: clamp(1.8rem, 6vw, 3rem); font-weight: 900; color: #2c2c2c; line-height: 1.1; }
+.subtitle { font-size: clamp(1rem, 3.5vw, 1.4rem); font-weight: 700; color: var(--coral); margin-top: 6px; }
+.week-range {
+  display: inline-block; background: var(--orange); color: white;
+  font-size: 0.95rem; font-weight: 700; border-radius: 999px; padding: 4px 18px; margin-top: 12px;
+}
+
+.schedule-card {
+  background: var(--cream); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 20px; margin-bottom: 22px; text-align: center;
+}
+.schedule-card h2 { font-size: 1.2rem; font-weight: 700; color: #444; margin-bottom: 14px; }
+#schedule-img, #schedule-placeholder { width: 100%; border-radius: 12px; display: block; }
+#schedule-img { box-shadow: 0 2px 12px rgba(0,0,0,0.14); }
+#schedule-placeholder {
+  height: 260px;
+  background: linear-gradient(135deg, #ffd6cc 0%, #ffeac2 35%, #c2f0e8 65%, #c2deff 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; font-weight: 700; color: #666;
+}
+.schedule-caption { margin-top: 12px; font-size: 0.95rem; color: #666; font-weight: 500; }
+
+.teachers-card {
+  background: var(--cream); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 24px 20px; margin-bottom: 22px;
+}
+.teachers-card h2 { font-size: 1.3rem; font-weight: 900; color: #2c2c2c; margin-bottom: 18px; text-align: center; }
+.teachers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+
+.teacher-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 14px 10px; border: none; border-radius: 14px; cursor: pointer;
+  text-decoration: none; font-family: 'Rubik', sans-serif; font-size: 0.95rem;
+  font-weight: 700; color: white; text-align: center; line-height: 1.3;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.18); -webkit-tap-highlight-color: transparent;
+}
+.teacher-btn:hover, .teacher-btn:focus-visible {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.22); filter: brightness(1.08); outline: none;
+}
+.teacher-btn:active { transform: translateY(0) scale(0.97); }
+.teacher-btn.zoom { background: linear-gradient(135deg, #2D8CFF, #1a6fd4); }
+.teacher-btn.meet { background: linear-gradient(135deg, #34A853, #1e8c3a); }
+.teacher-btn.ytec { background: linear-gradient(135deg, #FF8C00, #e07000); }
+.btn-icon { font-size: 1.4rem; line-height: 1; }
+.btn-name { word-break: break-word; }
+
+footer {
+  text-align: center; color: #555; font-size: 0.9rem; font-weight: 500;
+  background: var(--cream); border-radius: var(--radius);
+  box-shadow: var(--shadow); padding: 16px;
+}
+
+@media (max-width: 480px) {
+  .teachers-grid { grid-template-columns: repeat(2, 1fr); }
+  .teacher-btn { font-size: 0.85rem; padding: 12px 8px; }
+}
+@media (min-width: 700px) {
+  .teachers-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+}
