@@ -50,6 +50,19 @@ h1 { font-size: clamp(1.8rem, 6vw, 3rem); font-weight: 900; color: #2c2c2c; line
 .schedule-card h2 { font-size: 1.2rem; font-weight: 700; color: #444; margin-bottom: 6px; }
 .schedule-caption { margin-bottom: 14px; font-size: 0.9rem; color: #888; font-weight: 500; }
 
+.tt-legend {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+  margin-bottom: 10px;
+}
+.legend-item {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.82rem; font-weight: 700; padding: 5px 14px;
+  border-radius: 999px; color: white;
+}
+.legend-zoom { background: linear-gradient(135deg, #2D8CFF, #1a6fd4); }
+.legend-meet { background: linear-gradient(135deg, #34A853, #1e8c3a); }
+.legend-task { background: linear-gradient(135deg, #f0c040, #d4a010); color: #4a3000; }
+
 /* ── Timetable ─────────────────────────────────────────── */
 .timetable-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; }
 
