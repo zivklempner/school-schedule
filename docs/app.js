@@ -1,10 +1,34 @@
 const HEBREW_MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
 const OFEK_URL  = 'https://myofek.cet.ac.il/';
-const SHARE_URL = 'https://tinyurl.com/25qzaruv';
+const SHARE_URL = 'https://zivklempner.github.io/g32';
 
-const DAYS  = ['ראשון','שני','שלישי','רביעי','חמישי'];
-const TIMES = ['10:00','10:30','11:00','12:00','13:00'];
+const DAYS     = ['ראשון','שני','שלישי','רביעי','חמישי'];
+const TIMES    = ['10:00','10:30','11:00','12:00','13:00'];
 const SLOT_MINS = [[600,630],[630,660],[660,720],[720,780],[780,810]];
+
+// ── Analytics (localStorage, per-device) ──────────────────
+
+function trackVisit() {
+  const data = getAnalytics();
+  data.visits.push({ ts: Date.now() });
+  if (data.visits.length > 500) data.visits = data.visits.slice(-500);
+  saveAnalytics(data);
+}
+
+function trackClick(name) {
+  const data = getAnalytics();
+  data.clicks[name] = (data.clicks[name] || 0) + 1;
+  saveAnalytics(data);
+}
+
+function getAnalytics() {
+  try { return JSON.parse(localStorage.getItem('analytics') || '{"visits":[],"clicks":{}}'); }
+  catch { return { visits: [], clicks: {} }; }
+}
+
+function saveAnalytics(data) {
+  try { localStorage.setItem('analytics', JSON.stringify(data)); } catch {}
+}
 
 // ── Helpers ────────────────────────────────────────────────
 
@@ -74,6 +98,7 @@ function renderTimetable(links, cells) {
         a.href = OFEK_URL; a.target = '_blank'; a.rel = 'noopener noreferrer';
         a.className = 'tt-task-link';
         a.innerHTML = `<span class="tt-task-label">📝 משימה</span><span class="tt-subject">${cell.subject}</span>`;
+        a.addEventListener('click', () => trackClick('📝 ' + cell.subject));
         td.appendChild(a);
       } else {
         const url = links[cell.teacher];
@@ -84,6 +109,7 @@ function renderTimetable(links, cells) {
           const a = document.createElement('a');
           a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
           a.className = 'tt-link'; a.innerHTML = inner;
+          a.addEventListener('click', () => trackClick(cell.teacher));
           td.appendChild(a);
         } else {
           td.innerHTML = inner;
@@ -94,60 +120,77 @@ function renderTimetable(links, cells) {
   });
 }
 
-// ── Live indicator (fixed) ─────────────────────────────────
-// "current" = any slot we're in (task or live)
-// "next"    = next LIVE (non-task) slot only — tasks don't need joining
+// ── Live indicator ─────────────────────────────────────────
+// Two separate pills:
+//   now-pill  → what's happening RIGHT NOW (hidden outside school hours)
+//   next-pill → next LIVE (non-task) class countdown
 
 function updateLive(cells) {
   const now       = new Date();
   const dayOfWeek = now.getDay();
   const nowMin    = now.getHours() * 60 + now.getMinutes();
-  const pill      = document.getElementById('next-lesson');
 
+  const nowPill  = document.getElementById('now-pill');
+  const nextPill = document.getElementById('next-lesson');
+
+  // Clear row highlights; mark today column
   document.querySelectorAll('tr.tt-now').forEach(el => el.classList.remove('tt-now'));
   document.querySelectorAll('[data-day]').forEach(el =>
     el.classList.toggle('tt-today', parseInt(el.dataset.day) === dayOfWeek)
   );
 
   if (dayOfWeek > 4) {
-    pill.textContent = '🌟 סוף שבוע — נתראה ביום ראשון!';
+    nowPill.style.display = 'none';
+    nextPill.textContent = '🌟 סוף שבוע';
+    nextPill.style.display = '';
     return;
   }
 
+  // Find current slot (any) and next LIVE slot (skip tasks)
   let currentSlot  = -1;
-  let nextLiveSlot = -1; // skip tasks — only slots with a real teacher
+  let nextLiveSlot = -1;
 
   for (let i = 0; i < SLOT_MINS.length; i++) {
     const [s, e] = SLOT_MINS[i];
     if (nowMin >= s && nowMin < e) {
       currentSlot = i;
-    } else if (nowMin < s && nextLiveSlot === -1) {
+    }
+    if (nowMin < s && nextLiveSlot === -1) {
       const c = cells[i]?.[dayOfWeek];
-      if (c && !c.task) nextLiveSlot = i; // only count live lessons as "next"
+      if (c && !c.task) nextLiveSlot = i;
     }
   }
 
-  // Label for a cell: show actual subject even for tasks (not the generic word)
-  const slotLabel = (idx) => {
-    const c = cells[idx]?.[dayOfWeek];
-    if (!c) return null;
-    return c.task ? `📝 ${c.subject}` : c.subject;
-  };
-
+  // ── Now pill ───────────────────────────────────────────
   if (currentSlot !== -1) {
     const rows = document.querySelectorAll('#timetable tbody tr');
     rows[currentSlot]?.classList.add('tt-now');
-    const rem = SLOT_MINS[currentSlot][1] - nowMin;
-    const lbl = slotLabel(currentSlot);
-    pill.textContent = lbl ? `⏱ ${lbl} — עוד ${rem} דק׳` : `⏱ עוד ${rem} דק׳`;
-  } else if (nextLiveSlot !== -1) {
-    const min = SLOT_MINS[nextLiveSlot][0] - nowMin;
-    const c   = cells[nextLiveSlot][dayOfWeek];
-    pill.textContent = `🔔 הבא: ${c.subject} — בעוד ${min} דק׳`;
-  } else if (nowMin < SLOT_MINS[0][0]) {
-    pill.textContent = '🌅 השיעורים מתחילים ב-10:00';
+
+    const c = cells[currentSlot]?.[dayOfWeek];
+    if (c) {
+      const label = c.task ? `📝 ${c.subject}` : c.subject;
+      const rem   = SLOT_MINS[currentSlot][1] - nowMin;
+      nowPill.textContent  = `🟢 עכשיו: ${label} (עוד ${rem} דק׳)`;
+      nowPill.style.display = '';
+    } else {
+      nowPill.style.display = 'none';
+    }
   } else {
-    pill.textContent = '🎉 כל השיעורים הסתיימו!';
+    nowPill.style.display = 'none';
+  }
+
+  // ── Next pill ──────────────────────────────────────────
+  if (nextLiveSlot !== -1) {
+    const c   = cells[nextLiveSlot][dayOfWeek];
+    const min = SLOT_MINS[nextLiveSlot][0] - nowMin;
+    nextPill.textContent  = `🔔 הבא: ${c.subject} — בעוד ${min} דק׳`;
+    nextPill.style.display = '';
+  } else if (nowMin < SLOT_MINS[0][0]) {
+    nextPill.textContent  = '🌅 מתחילים ב-10:00';
+    nextPill.style.display = '';
+  } else {
+    nextPill.textContent  = '🎉 כל השיעורים הסתיימו!';
+    nextPill.style.display = '';
   }
 }
 
@@ -159,32 +202,28 @@ function setupTodayToggle(autoOn) {
 
   const setOn = (on) => {
     const hasToday = table.querySelector('[data-day].tt-today');
-    if (on && !hasToday) return; // weekend — nothing to filter
+    if (on && !hasToday) return;
     table.classList.toggle('today-only', on);
-    btn.textContent = on ? '📅 כל הימים' : '📍 היום בלבד';
+    btn.textContent = on ? '📅 כל הימים' : '📍 היום';
     btn.classList.toggle('active', on);
   };
 
   if (autoOn) setOn(true);
-
   btn.addEventListener('click', () => setOn(!table.classList.contains('today-only')));
 }
 
-// ── Share / TinyURL ────────────────────────────────────────
+// ── Share ──────────────────────────────────────────────────
 
 function setupShare() {
   const btn = document.getElementById('share-btn');
   btn.addEventListener('click', async () => {
     if (navigator.share) {
-      try {
-        await navigator.share({ title: 'מערכת ג׳2 — צוות הדר', url: SHARE_URL });
-        return;
-      } catch { /* user cancelled */ }
+      try { await navigator.share({ title: 'מערכת ג׳2 — צוות הדר', url: SHARE_URL }); return; }
+      catch { /* cancelled */ }
     }
-    // Fallback: copy to clipboard
     try {
       await navigator.clipboard.writeText(SHARE_URL);
-      showToast('הקישור הועתק! ' + SHARE_URL);
+      showToast('🔗 הקישור הועתק!');
     } catch {
       showToast(SHARE_URL);
     }
@@ -193,11 +232,7 @@ function setupShare() {
 
 function showToast(msg) {
   let t = document.getElementById('toast');
-  if (!t) {
-    t = document.createElement('div');
-    t.id = 'toast';
-    document.body.appendChild(t);
-  }
+  if (!t) { t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); }
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(t._timer);
@@ -216,7 +251,7 @@ async function setupNotifications(cells) {
   const refresh = () => {
     const p = Notification.permission;
     if (p === 'granted') {
-      btn.title = 'התראות פעילות';
+      btn.title = 'התראות פעילות ✓';
       btn.classList.add('notify-active');
       btn.style.display = 'flex';
       if (!_notificationsScheduled) scheduleNotifications(cells);
@@ -227,7 +262,6 @@ async function setupNotifications(cells) {
       btn.style.display = 'flex';
     }
   };
-
   refresh();
   btn.addEventListener('click', async () => {
     if (Notification.permission === 'granted') return;
@@ -270,11 +304,10 @@ function initDarkMode() {
   const dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
   if (dark) document.documentElement.dataset.theme = 'dark';
   btn.textContent = dark ? '☀️' : '🌙';
-
   btn.addEventListener('click', () => {
     const isDark = document.documentElement.dataset.theme === 'dark';
-    delete document.documentElement.dataset.theme;
-    if (!isDark) document.documentElement.dataset.theme = 'dark';
+    if (isDark) { delete document.documentElement.dataset.theme; }
+    else { document.documentElement.dataset.theme = 'dark'; }
     localStorage.setItem('theme', isDark ? 'light' : 'dark');
     btn.textContent = isDark ? '🌙' : '☀️';
   });
@@ -287,9 +320,7 @@ async function registerSW() {
   try {
     _swReg = await navigator.serviceWorker.register('./sw.js');
     navigator.serviceWorker.addEventListener('controllerchange', () => window.location.reload());
-  } catch (e) {
-    console.warn('SW registration failed', e);
-  }
+  } catch (e) { console.warn('SW:', e); }
 }
 
 // ── Bootstrap ──────────────────────────────────────────────
@@ -297,6 +328,7 @@ async function registerSW() {
 async function init() {
   initDarkMode();
   registerSW();
+  trackVisit();
 
   let links, scheduleData;
   try {
@@ -306,7 +338,6 @@ async function init() {
   } catch {
     document.getElementById('teachers-grid').innerHTML =
       '<p style="color:#c00;text-align:center">שגיאה בטעינת הנתונים.</p>';
-    document.getElementById('next-lesson').textContent = '';
     return;
   }
 
@@ -323,7 +354,6 @@ async function init() {
   updateLive(cells);
   setInterval(() => updateLive(cells), 60_000);
 
-  // Auto today-only on narrow screens
   const isMobile = window.matchMedia('(max-width: 600px)').matches;
   setupTodayToggle(isMobile);
   setupNotifications(cells);
@@ -338,6 +368,7 @@ async function init() {
     a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
     a.className = `teacher-btn ${cls}`;
     a.innerHTML = `<span class="btn-icon">${icon}</span><span class="btn-name">${name}</span>`;
+    a.addEventListener('click', () => trackClick(name));
     grid.appendChild(a);
   }
 }

@@ -149,7 +149,17 @@ h1 {
   padding: 5px 16px;
   white-space: nowrap;
 }
-.next-lesson-pill {
+.now-pill {
+  background: #22b857;
+  color: white;
+  font-size: 0.88rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 5px 16px;
+  max-width: 100%;
+  text-align: center;
+}
+.next-pill {
   background: var(--teal);
   color: white;
   font-size: 0.88rem;
@@ -413,14 +423,14 @@ footer {
   padding: 14px 16px;
   padding-bottom: max(14px, env(safe-area-inset-bottom));
 }
-.footer-url { margin-top: 6px; }
-.footer-url a {
-  color: var(--teal);
-  font-weight: 700;
-  text-decoration: none;
-  font-size: 0.85rem;
+.footer-links {
+  margin-top: 8px;
+  display: flex; flex-wrap: wrap; justify-content: center;
+  align-items: center; gap: 6px; font-size: 0.82rem;
 }
-.footer-url a:hover { text-decoration: underline; }
+.footer-links a { color: var(--teal); font-weight: 700; text-decoration: none; }
+.footer-links a:hover { text-decoration: underline; }
+.footer-sep { color: var(--text-muted); }
 
 /* ── Toast ────────────────────────────────────────────────── */
 #toast {

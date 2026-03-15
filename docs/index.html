@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>מערכת ג׳2 — צוות הדר</title>
 
-  <!-- Favicon & PWA -->
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="favicon.svg" />
   <link rel="manifest" href="manifest.json" />
@@ -14,35 +13,39 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="מערכת ג׳2" />
   <meta name="mobile-web-app-capable" content="yes" />
-
-  <!-- Social -->
   <meta property="og:title" content="מערכת למידה מרחוק — כיתה ג׳2" />
   <meta property="og:description" content="מערכת שעות ולינקים לשיעורים — כיתה ג׳2 צוות הדר" />
 
   <link rel="stylesheet" href="style.css" />
+
+  <!-- ── Analytics (GoatCounter) ────────────────────────────────
+       To enable: create a free account at https://www.goatcounter.com
+       then replace YOUR-CODE below with your site code.
+  <script data-goatcounter="https://YOUR-CODE.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
+  ──────────────────────────────────────────────────────────── -->
 </head>
 <body>
   <div class="page-wrapper">
 
-    <!-- ── Header ── -->
     <header class="header-card">
       <div class="header-top-row">
-        <button class="icon-btn" id="dark-toggle" title="מצב כהה / בהיר" aria-label="החלף ערכת נושא">🌙</button>
+        <button class="icon-btn" id="dark-toggle" title="מצב כהה / בהיר">🌙</button>
         <span class="deco-top" aria-hidden="true">🌸 🌈 🌼</span>
         <div class="header-top-actions">
-          <button class="icon-btn notify-btn" id="notify-btn" style="display:none" title="התראות" aria-label="הפעל התראות">🔔</button>
-          <button class="icon-btn" id="share-btn" title="שתף קישור" aria-label="שתף קישור">📤</button>
+          <button class="icon-btn notify-btn" id="notify-btn" style="display:none" title="הפעל התראות">🔔</button>
+          <button class="icon-btn" id="share-btn" title="שתף קישור">📤</button>
         </div>
       </div>
       <h1>מערכת למידה מרחוק</h1>
       <div class="subtitle">כיתה ג׳2 — צוות הדר</div>
       <div class="header-meta">
         <span class="week-range" id="week-range">…</span>
-        <span class="next-lesson-pill" id="next-lesson">טוען…</span>
+        <span class="now-pill"  id="now-pill"    style="display:none">…</span>
+        <span class="next-pill" id="next-lesson">טוען…</span>
       </div>
     </header>
 
-    <!-- ── Schedule ── -->
     <section class="schedule-card">
       <div class="schedule-card-header">
         <h2>📅 מערכת השעות</h2>
@@ -62,7 +65,6 @@
       </div>
     </section>
 
-    <!-- ── Teachers ── -->
     <section class="teachers-card">
       <h2>🔗 כל הקישורים</h2>
       <div class="teachers-grid" id="teachers-grid">
@@ -72,8 +74,10 @@
 
     <footer>
       <span>🌸</span> לעדכונים פנו למחנכת הכיתה <span>🌸</span>
-      <div class="footer-url">
-        <a href="https://tinyurl.com/25qzaruv" target="_blank" rel="noopener">tinyurl.com/25qzaruv</a>
+      <div class="footer-links">
+        <a href="https://zivklempner.github.io/g32" target="_blank" rel="noopener">🔗 zivklempner.github.io/g32</a>
+        <span class="footer-sep">·</span>
+        <a href="admin.html">📊 מנהל</a>
       </div>
     </footer>
 

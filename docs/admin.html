@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>לוח בקרה — ג׳2</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;900&display=swap');
+
+    :root {
+      --teal: #4ECDC4; --coral: #FF6B6B; --orange: #FFB347;
+      --bg: #f0faf7; --card: #fff; --text: #2c2c2c; --muted: #888;
+      --radius: 14px; --shadow: 0 2px 12px rgba(0,0,0,0.09);
+    }
+    [data-theme="dark"] {
+      --bg: #111d1d; --card: #1e2d2d; --text: #e8e8e8; --muted: #999;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Rubik', sans-serif; direction: rtl;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; padding: 20px 16px 40px;
+      transition: background 0.25s, color 0.25s;
+    }
+    .wrap { max-width: 720px; margin: 0 auto; }
+
+    /* ── Lock screen ── */
+    #lock {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; min-height: 80vh; gap: 16px; text-align: center;
+    }
+    #lock h2 { font-size: 1.8rem; font-weight: 900; }
+    #lock p  { color: var(--muted); font-size: 0.9rem; }
+    .lock-form { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+    .lock-form input {
+      border: 2px solid #ddd; border-radius: 999px; padding: 10px 18px;
+      font-size: 1rem; font-family: 'Rubik', sans-serif; outline: none;
+      background: var(--card); color: var(--text); width: 200px; text-align: center;
+    }
+    .lock-form input:focus { border-color: var(--teal); }
+    .btn {
+      background: var(--teal); color: white; border: none;
+      border-radius: 999px; padding: 10px 22px; font-size: 1rem;
+      font-weight: 700; font-family: 'Rubik', sans-serif; cursor: pointer;
+      transition: filter 0.15s;
+    }
+    .btn:hover { filter: brightness(1.1); }
+    .btn.coral { background: var(--coral); }
+    .btn.small { padding: 6px 14px; font-size: 0.82rem; }
+
+    /* ── Dashboard ── */
+    #dash { display: none; }
+    .dash-header {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 10px; margin-bottom: 20px;
+    }
+    .dash-header h1 { font-size: 1.6rem; font-weight: 900; }
+
+    .card {
+      background: var(--card); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 18px; margin-bottom: 14px;
+    }
+    .card h3 {
+      font-size: 1rem; font-weight: 700; color: var(--muted);
+      margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    /* ── Stat grid ── */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap: 12px; }
+    .stat-box {
+      background: var(--bg); border-radius: 10px; padding: 14px 12px; text-align: center;
+    }
+    .stat-num  { font-size: 2rem; font-weight: 900; color: var(--teal); line-height: 1; }
+    .stat-label{ font-size: 0.78rem; color: var(--muted); font-weight: 600; margin-top: 4px; }
+
+    /* ── Sparkline (7 days) ── */
+    .sparkline { display: flex; align-items: flex-end; gap: 4px; height: 60px; margin-top: 10px; }
+    .spark-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .spark-bar {
+      width: 100%; border-radius: 4px 4px 0 0;
+      background: linear-gradient(180deg, var(--teal), #35b0a8);
+      transition: height 0.4s ease; min-height: 2px;
+    }
+    .spark-bar.today { background: linear-gradient(180deg, var(--coral), #e85555); }
+    .spark-label { font-size: 0.62rem; color: var(--muted); font-weight: 600; }
+
+    /* ── Click list ── */
+    .click-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 0; border-bottom: 1px solid rgba(128,128,128,0.1);
+    }
+    .click-row:last-child { border-bottom: none; }
+    .click-name  { flex: 1; font-weight: 600; font-size: 0.9rem; }
+    .click-count { font-weight: 900; color: var(--teal); min-width: 28px; text-align: left; }
+    .click-bar-bg { flex: 2; background: rgba(128,128,128,0.1); border-radius: 99px; height: 6px; overflow: hidden; }
+    .click-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--teal), #35b0a8); }
+
+    /* ── Notice ── */
+    .notice {
+      background: #fffbe6; border: 1.5px solid #f0c040; border-radius: 10px;
+      padding: 12px 14px; font-size: 0.85rem; color: #6b4f00; margin-bottom: 14px;
+    }
+    [data-theme="dark"] .notice { background: #3a3010; border-color: #6b4f00; color: #f0c060; }
+    .notice a { color: var(--teal); font-weight: 700; }
+
+    /* ── GoatCounter setup ── */
+    .setup-steps { list-style: none; counter-reset: step; }
+    .setup-steps li {
+      counter-increment: step; display: flex; gap: 12px;
+      padding: 10px 0; border-bottom: 1px solid rgba(128,128,128,0.1); font-size: 0.88rem;
+    }
+    .setup-steps li:last-child { border-bottom: none; }
+    .setup-steps li::before {
+      content: counter(step); background: var(--teal); color: white;
+      border-radius: 50%; width: 22px; height: 22px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 900; margin-top: 1px;
+    }
+    code {
+      background: rgba(128,128,128,0.12); border-radius: 4px;
+      padding: 1px 5px; font-family: monospace; font-size: 0.85em;
+      direction: ltr; display: inline-block;
+    }
+
+    /* ── Misc ── */
+    .back-link { font-size: 0.85rem; color: var(--teal); text-decoration: none; font-weight: 700; }
+    .back-link:hover { text-decoration: underline; }
+    .no-data { color: var(--muted); font-size: 0.88rem; text-align: center; padding: 16px 0; }
+    .last-visit { font-size: 0.78rem; color: var(--muted); margin-top: 6px; }
+
+    @media (max-width: 480px) {
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Lock screen ──────────────────────────────────────── -->
+<div id="lock">
+  <div style="font-size:3rem">🔐</div>
+  <h2>לוח בקרה — מנהל</h2>
+  <p>כיתה ג׳2 · צוות הדר</p>
+  <div class="lock-form">
+    <input type="password" id="pwd" placeholder="סיסמה" autocomplete="current-password" />
+    <button class="btn" onclick="checkPass()">כניסה</button>
+  </div>
+  <p id="pwd-err" style="color:#c00;font-size:0.85rem;display:none">סיסמה שגויה</p>
+</div>
+
+<!-- ── Dashboard ────────────────────────────────────────── -->
+<div id="dash">
+<div class="wrap">
+
+  <div class="dash-header">
+    <div>
+      <h1>📊 לוח בקרה</h1>
+      <div style="font-size:0.8rem;color:var(--muted);margin-top:2px">כיתה ג׳2 · צוות הדר</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="btn small coral" onclick="clearData()">🗑 אפס נתונים</button>
+      <a href="index.html" class="back-link">← חזרה</a>
+    </div>
+  </div>
+
+  <div class="notice">
+    ⚠️ הסטטיסטיקות האלה נאספות <strong>מהמכשיר הנוכחי בלבד</strong>.
+    לנתונים אמיתיים מכל המשתמשים, הפעל
+    <a href="https://www.goatcounter.com" target="_blank" rel="noopener">GoatCounter</a>
+    (ראה הוראות למטה).
+  </div>
+
+  <!-- Stat boxes -->
+  <div class="card">
+    <h3>📈 סיכום כללי</h3>
+    <div class="stat-grid">
+      <div class="stat-box">
+        <div class="stat-num" id="stat-total">0</div>
+        <div class="stat-label">ביקורים סה"כ</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="stat-today">0</div>
+        <div class="stat-label">ביקורים היום</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="stat-week">0</div>
+        <div class="stat-label">ביקורים השבוע</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="stat-clicks">0</div>
+        <div class="stat-label">לחיצות על שיעורים</div>
+      </div>
+    </div>
+    <div class="last-visit" id="last-visit"></div>
+  </div>
+
+  <!-- Sparkline: last 7 days -->
+  <div class="card">
+    <h3>📅 ביקורים ב-7 ימים האחרונים</h3>
+    <div class="sparkline" id="sparkline"></div>
+  </div>
+
+  <!-- Hour heatmap -->
+  <div class="card">
+    <h3>🕐 שעות פעילות</h3>
+    <div id="hour-chart" style="display:flex;gap:3px;flex-wrap:wrap;margin-top:8px"></div>
+  </div>
+
+  <!-- Click leaderboard -->
+  <div class="card">
+    <h3>🔗 קישורים שנלחצו</h3>
+    <div id="click-list"></div>
+  </div>
+
+  <!-- GoatCounter setup -->
+  <div class="card">
+    <h3>🌐 הגדרת ניתוח תנועה מלא (GoatCounter)</h3>
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:12px">
+      שירות חינמי, ללא עוגיות, לסטטיסטיקות מכל המשתמשים.
+    </p>
+    <ol class="setup-steps">
+      <li>
+        <span>
+          גש ל-<a href="https://www.goatcounter.com" target="_blank" rel="noopener" style="color:var(--teal);font-weight:700">goatcounter.com</a>
+          ולחץ <strong>Sign up</strong>.
+        </span>
+      </li>
+      <li>
+        <span>
+          בחר קוד אתר (לדוגמה: <code>hadar-g32</code>) וסיים את ההרשמה.
+        </span>
+      </li>
+      <li>
+        <span>
+          פתח את קובץ <code>docs/index.html</code> ומצא את הבלוק <code>&lt;!-- Analytics --&gt;</code>.
+          הסר את ה-<code>&lt;!--</code> וה-<code>--&gt;</code> ושנה <code>YOUR-CODE</code> לקוד שבחרת.
+        </span>
+      </li>
+      <li>
+        <span>
+          שמור ודחוף ל-GitHub. הנתונים יתחילו להצטבר תוך דקות.
+          לוח הבקרה: <code>hadar-g32.goatcounter.com</code>
+        </span>
+      </li>
+    </ol>
+  </div>
+
+  <div style="text-align:center;font-size:0.78rem;color:var(--muted);margin-top:8px">
+    לשינוי הסיסמה, ערוך את <code>admin.html</code> ושנה את <code>ADMIN_PASS</code>.
+  </div>
+
+</div>
+</div>
+
+<script>
+// ── Change this password ──────────────────────────────────
+const ADMIN_PASS = 'hadar2026';
+// ─────────────────────────────────────────────────────────
+
+document.getElementById('pwd').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkPass();
+});
+
+function checkPass() {
+  if (document.getElementById('pwd').value === ADMIN_PASS) {
+    document.getElementById('lock').style.display = 'none';
+    document.getElementById('dash').style.display = 'block';
+    loadDash();
+  } else {
+    document.getElementById('pwd-err').style.display = 'block';
+    document.getElementById('pwd').value = '';
+  }
+}
+
+function getAnalytics() {
+  try { return JSON.parse(localStorage.getItem('analytics') || '{"visits":[],"clicks":{}}'); }
+  catch { return { visits: [], clicks: {} }; }
+}
+
+function loadDash() {
+  const data = getAnalytics();
+  const visits = data.visits || [];
+  const clicks = data.clicks || {};
+
+  const now   = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const weekAgo = today - 6 * 86400000;
+
+  const todayCount = visits.filter(v => v.ts >= today).length;
+  const weekCount  = visits.filter(v => v.ts >= weekAgo).length;
+  const totalClicks = Object.values(clicks).reduce((a,b) => a + b, 0);
+
+  document.getElementById('stat-total').textContent  = visits.length;
+  document.getElementById('stat-today').textContent  = todayCount;
+  document.getElementById('stat-week').textContent   = weekCount;
+  document.getElementById('stat-clicks').textContent = totalClicks;
+
+  if (visits.length) {
+    const last = new Date(visits[visits.length - 1].ts);
+    document.getElementById('last-visit').textContent =
+      `ביקור אחרון: ${last.toLocaleDateString('he-IL')} בשעה ${last.toLocaleTimeString('he-IL', {hour:'2-digit',minute:'2-digit'})}`;
+  }
+
+  renderSparkline(visits, today, weekAgo);
+  renderHourChart(visits);
+  renderClickList(clicks);
+}
+
+function renderSparkline(visits, today, weekAgo) {
+  const DAYS_HE = ['א׳','ב׳','ג׳','ד׳','ה׳','ו׳','ש׳'];
+  const container = document.getElementById('sparkline');
+  container.innerHTML = '';
+
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today - i * 86400000);
+    const start = d.getTime(), end = start + 86400000;
+    const count = visits.filter(v => v.ts >= start && v.ts < end).length;
+    days.push({ count, label: DAYS_HE[d.getDay()], isToday: i === 0 });
+  }
+
+  const maxCount = Math.max(...days.map(d => d.count), 1);
+  days.forEach(({ count, label, isToday }) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'spark-bar-wrap';
+    const pct = Math.max((count / maxCount) * 52, count > 0 ? 4 : 2);
+    wrap.innerHTML = `
+      <div class="spark-bar${isToday ? ' today' : ''}" style="height:${pct}px" title="${count} ביקורים"></div>
+      <div class="spark-label">${label}</div>`;
+    container.appendChild(wrap);
+  });
+}
+
+function renderHourChart(visits) {
+  const container = document.getElementById('hour-chart');
+  container.innerHTML = '';
+  const counts = new Array(24).fill(0);
+  visits.forEach(v => counts[new Date(v.ts).getHours()]++);
+  const max = Math.max(...counts, 1);
+
+  counts.forEach((c, h) => {
+    const opacity = 0.1 + (c / max) * 0.9;
+    const box = document.createElement('div');
+    box.title = `${h}:00 — ${c} ביקורים`;
+    box.style.cssText = `
+      width: calc(100%/24 - 2px); height: 32px; border-radius: 4px;
+      background: rgba(78,205,196,${opacity.toFixed(2)});
+      display: flex; align-items: flex-end; justify-content: center;
+      padding-bottom: 2px; font-size: 0.55rem; font-weight: 700; color: #2c2c2c;
+      cursor: default;`;
+    if (c > 0) box.textContent = h;
+    container.appendChild(box);
+  });
+
+  const labels = document.createElement('div');
+  labels.style.cssText = 'width:100%;display:flex;justify-content:space-between;margin-top:4px;font-size:0.62rem;color:var(--muted)';
+  labels.innerHTML = '<span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>23:00</span>';
+  container.parentElement.appendChild(labels);
+}
+
+function renderClickList(clicks) {
+  const container = document.getElementById('click-list');
+  const sorted = Object.entries(clicks).sort((a,b) => b[1] - a[1]);
+  if (!sorted.length) {
+    container.innerHTML = '<p class="no-data">אין נתונים עדיין — לחץ על כמה שיעורים בדף הראשי</p>';
+    return;
+  }
+  const max = sorted[0][1];
+  container.innerHTML = sorted.map(([name, count]) => `
+    <div class="click-row">
+      <span class="click-name">${name}</span>
+      <span class="click-count">${count}</span>
+      <div class="click-bar-bg">
+        <div class="click-bar-fill" style="width:${(count/max*100).toFixed(0)}%"></div>
+      </div>
+    </div>`).join('');
+}
+
+function clearData() {
+  if (!confirm('למחוק את כל הנתונים?')) return;
+  localStorage.removeItem('analytics');
+  loadDash();
+}
+
+// Dark mode sync with main page
+const stored = localStorage.getItem('theme');
+if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+  document.documentElement.dataset.theme = 'dark';
+}
+</script>
+</body>
+</html>
