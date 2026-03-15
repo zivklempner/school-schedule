@@ -203,7 +203,7 @@ function updateLive(cells) {
 
 // ── Lesson timer ───────────────────────────────────────────
 
-function updateLessonTimer() {
+function updateLessonTimer(cells) {
   const timer     = document.getElementById('lesson-timer');
   const now       = new Date();
   const dayOfWeek = now.getDay();
@@ -212,13 +212,17 @@ function updateLessonTimer() {
 
   if (dayOfWeek > 4) { timer.style.display = 'none'; return; }
 
-  // Find current slot (in lesson) or next slot (between lessons)
+  // Find current slot (in lesson) or next slot that actually has a lesson
   let currentSlot = -1;
   let nextSlot    = -1;
   for (let i = 0; i < SLOT_MINS.length; i++) {
     const [s, e] = SLOT_MINS[i];
-    if (nowSec >= s * 60 && nowSec < e * 60) { currentSlot = i; break; }
-    if (nowMin < s && nextSlot === -1) nextSlot = i;
+    if (nowSec >= s * 60 && nowSec < e * 60 && cells[i]?.[dayOfWeek]) {
+      currentSlot = i; break;
+    }
+    if (nowMin < s && nextSlot === -1 && cells[i]?.[dayOfWeek]) {
+      nextSlot = i;
+    }
   }
 
   if (currentSlot !== -1) {
@@ -231,33 +235,31 @@ function updateLessonTimer() {
     const remainMin  = Math.ceil(remainSec / 60);
     const label      = remainMin === 1 ? 'דקה אחת' : `${remainMin} דק׳`;
 
-    document.getElementById('lesson-timer-fill').style.width  = pct.toFixed(1) + '%';
-    document.getElementById('lesson-timer-label').textContent = `⏱ נשארו: ${label}`;
-    document.getElementById('lesson-timer-pct').textContent   = Math.round(pct) + '%';
-    document.getElementById('lesson-timer-fill').style.background =
-      'linear-gradient(90deg, #22b857, #4ECDC4)';
+    document.getElementById('lesson-timer-fill').style.width      = pct.toFixed(1) + '%';
+    document.getElementById('lesson-timer-label').textContent     = `⏱ נשארו: ${label}`;
+    document.getElementById('lesson-timer-pct').textContent       = Math.round(pct) + '%';
+    document.getElementById('lesson-timer-fill').style.background = 'linear-gradient(90deg, #22b857, #4ECDC4)';
     timer.style.display = 'flex';
 
   } else if (nextSlot !== -1) {
-    // ── Between lessons: countdown to next ────────────────
+    // ── Between lessons: countdown to next real lesson ────
     const [nextStart] = SLOT_MINS[nextSlot];
     const remainSec   = nextStart * 60 - nowSec;
     const totalBreak  = nextSlot === 0
-      ? nextStart * 60          // before school starts
+      ? nextStart * 60
       : nextStart * 60 - SLOT_MINS[nextSlot - 1][1] * 60;
-    const elapsed  = totalBreak - remainSec;
-    const pct      = Math.min(100, (elapsed / totalBreak) * 100);
-    const mins     = Math.floor(remainSec / 60);
-    const secs     = remainSec % 60;
-    const label    = mins > 0
+    const elapsed = totalBreak - remainSec;
+    const pct     = Math.min(100, (elapsed / totalBreak) * 100);
+    const mins    = Math.floor(remainSec / 60);
+    const secs    = remainSec % 60;
+    const label   = mins > 0
       ? `השיעור הבא בעוד ${mins}:${String(secs).padStart(2, '0')}`
       : `השיעור הבא בעוד ${secs} שנ׳`;
 
-    document.getElementById('lesson-timer-fill').style.width  = pct.toFixed(1) + '%';
-    document.getElementById('lesson-timer-label').textContent = `🔔 ${label}`;
-    document.getElementById('lesson-timer-pct').textContent   = '';
-    document.getElementById('lesson-timer-fill').style.background =
-      'linear-gradient(90deg, var(--orange), #FFD700)';
+    document.getElementById('lesson-timer-fill').style.width      = pct.toFixed(1) + '%';
+    document.getElementById('lesson-timer-label').textContent     = `🔔 ${label}`;
+    document.getElementById('lesson-timer-pct').textContent       = '';
+    document.getElementById('lesson-timer-fill').style.background = 'linear-gradient(90deg, var(--orange), #FFD700)';
     timer.style.display = 'flex';
 
   } else {
@@ -425,8 +427,8 @@ async function init() {
   updateLive(cells);
   setInterval(() => updateLive(cells), 60_000);
 
-  updateLessonTimer();
-  setInterval(updateLessonTimer, 1_000);
+  updateLessonTimer(cells);
+  setInterval(() => updateLessonTimer(cells), 1_000);
 
   const isMobile = window.matchMedia('(max-width: 600px)').matches;
   setupTodayToggle(isMobile);
