@@ -57,11 +57,8 @@ function findCurrentWeek(weeks) {
   return past.length ? past[past.length - 1] : sorted[0];
 }
 
-function classifyLink(url) {
-  if (url.includes('ytek-il.zoom.us')) return { cls: 'ytec', icon: '📹' };
-  if (url.includes('zoom.us'))         return { cls: 'zoom', icon: '🎥' };
-  if (url.includes('meet.google.com')) return { cls: 'meet', icon: '📹' };
-  return { cls: 'zoom', icon: '🔗' };
+function classifyLink(_url) {
+  return { cls: 'live', icon: '🎥' };
 }
 
 // ── Timetable renderer ─────────────────────────────────────
@@ -182,6 +179,9 @@ function updateLive(cells) {
     } else {
       nowPill.style.display = 'none';
     }
+    // hide next-pill while a class is running — no need for countdown
+    nextPill.style.display = 'none';
+    return;
   } else {
     nowPill.style.display = 'none';
   }

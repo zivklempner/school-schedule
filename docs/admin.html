@@ -249,9 +249,9 @@
   </div>
 
   <!-- Per-device stats (secondary) -->
-  <div class="notice">
+  <div class="notice" id="device-notice">
     📊 הנתונים הבאים נאספים <strong>מהמכשיר הנוכחי בלבד</strong>.
-    לנתונים מכל המשתמשים, השתמש בלוח GoatCounter למעלה.
+    לנתונים מכל המשתמשים, הגדר GoatCounter למעלה.
   </div>
 
   <!-- Stat boxes -->
@@ -311,15 +311,18 @@ const ADMIN_PASS = 'hadar2026';
 // ── GoatCounter code management ───────────────────────────
 function loadGCState() {
   const code = localStorage.getItem('gc_code');
+  const notice = document.getElementById('device-notice');
   if (code) {
     document.getElementById('gc-connected').style.display = '';
     document.getElementById('gc-setup').style.display = 'none';
     const link = document.getElementById('gc-dash-link');
     link.href = `https://${code}.goatcounter.com`;
     link.textContent = `📊 ${code}.goatcounter.com ↗`;
+    if (notice) notice.style.display = 'none';
   } else {
     document.getElementById('gc-connected').style.display = 'none';
     document.getElementById('gc-setup').style.display = '';
+    if (notice) notice.style.display = '';
   }
 }
 

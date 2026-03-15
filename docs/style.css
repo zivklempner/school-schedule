@@ -225,8 +225,7 @@ h1 {
   border-radius: 999px;
   color: white;
 }
-.legend-zoom { background: linear-gradient(135deg, #2D8CFF, #1a6fd4); }
-.legend-meet { background: linear-gradient(135deg, #34A853, #1e8c3a); }
+.legend-live { background: linear-gradient(135deg, #2D8CFF, #1a6fd4); }
 .legend-task { background: linear-gradient(135deg, #f0c040, #d4a010); color: #4a3000; }
 
 .schedule-caption {
@@ -347,9 +346,7 @@ h1 {
 .tt-link:hover  { filter: brightness(1.1); transform: scale(1.03); }
 .tt-link:active { transform: scale(0.97); }
 
-.tt-zoom .tt-link { background: linear-gradient(145deg, #4b9eff, #1a6fd4); }
-.tt-meet .tt-link { background: linear-gradient(145deg, #3fbd67, #1e8c3a); }
-.tt-ytec .tt-link { background: linear-gradient(145deg, #ffaa33, #e07000); }
+.tt-live .tt-link { background: linear-gradient(145deg, #4b9eff, #1a6fd4); }
 
 .tt-icon    { font-size: 1rem; line-height: 1; }
 .tt-teacher { font-size: 0.85rem; font-weight: 700; line-height: 1.2; }
@@ -496,8 +493,7 @@ footer {
 
   /* Force print colors */
   -webkit-print-color-adjust: exact; print-color-adjust: exact;
-  .tt-zoom .tt-link  { background: #2D8CFF !important; }
-  .tt-meet .tt-link  { background: #34A853 !important; }
+  .tt-live .tt-link  { background: #2D8CFF !important; }
   .tt-task           { background: #fff3cd !important; }
   .tt-day-header     { background: #FF6B6B !important; color: white !important; }
   .tt-day-header.tt-today { background: #4ECDC4 !important; }
