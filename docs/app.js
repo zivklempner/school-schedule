@@ -396,6 +396,72 @@ async function registerSW() {
   } catch (e) { console.warn('SW:', e); }
 }
 
+// ── Install banner ─────────────────────────────────────────
+
+let _installPrompt = null;
+
+function setupInstallBanner() {
+  const dismissed  = localStorage.getItem('install_dismissed');
+  const isIOS      = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isStandalone = window.navigator.standalone === true
+    || window.matchMedia('(display-mode: standalone)').matches;
+
+  if (isStandalone || dismissed) return;
+
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    _installPrompt = e;
+    setTimeout(() => showInstallBanner('chrome'), 2000);
+  });
+
+  if (isIOS) {
+    setTimeout(() => showInstallBanner('ios'), 2000);
+  }
+}
+
+function showInstallBanner(type) {
+  if (document.getElementById('install-banner')) return;
+
+  const banner = document.createElement('div');
+  banner.id = 'install-banner';
+  banner.className = 'install-banner';
+
+  if (type === 'ios') {
+    banner.innerHTML = `
+      <span class="install-icon">📲</span>
+      <div class="install-text">
+        <div class="install-title">התקן כאפליקציה</div>
+        <div class="install-sub">לחץ <strong>שתף</strong> <span style="font-size:1rem">⬆️</span> ← <strong>הוסף למסך הבית</strong></div>
+      </div>
+      <button class="install-close" onclick="dismissInstallBanner()">✕</button>`;
+  } else {
+    banner.innerHTML = `
+      <span class="install-icon">📲</span>
+      <div class="install-text">
+        <div class="install-title">התקן כאפליקציה</div>
+        <div class="install-sub">גישה מהירה ישירות מהמסך הראשי</div>
+      </div>
+      <button class="install-btn" onclick="doInstall()">התקן</button>
+      <button class="install-close" onclick="dismissInstallBanner()">✕</button>`;
+  }
+
+  document.body.appendChild(banner);
+  requestAnimationFrame(() => banner.classList.add('show'));
+}
+
+async function doInstall() {
+  if (!_installPrompt) return;
+  _installPrompt.prompt();
+  const { outcome } = await _installPrompt.userChoice;
+  if (outcome === 'accepted') dismissInstallBanner();
+}
+
+function dismissInstallBanner() {
+  const b = document.getElementById('install-banner');
+  if (b) { b.classList.remove('show'); setTimeout(() => b.remove(), 350); }
+  localStorage.setItem('install_dismissed', '1');
+}
+
 // ── Bootstrap ──────────────────────────────────────────────
 
 async function init() {
@@ -434,6 +500,7 @@ async function init() {
   setupTodayToggle(isMobile);
   setupNotifications(cells);
   setupShare();
+  setupInstallBanner();
 
   const grid = document.getElementById('teachers-grid');
   grid.innerHTML = '';
