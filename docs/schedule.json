@@ -1,0 +1,44 @@
+{
+  "weeks": [
+    {
+      "start": "2026-03-15",
+      "cells": [
+        [
+          {"subject": "רגשי",      "teacher": "רפית טסה"  },
+          {"subject": "מתמטיקה",   "teacher": "רפית טסה"  },
+          {"subject": "רגשי",      "teacher": "רפית טסה"  },
+          {"subject": "שפה",       "teacher": "אילת יוסף" },
+          {"subject": "רגשי",      "teacher": "רפית טסה"  }
+        ],
+        [
+          {"subject": "מתמטיקה",         "teacher": "רפית טסה" },
+          {"subject": "אומנות / אנגלית", "task": true           },
+          {"subject": "מתמטיקה",         "teacher": "רפית טסה" },
+          {"subject": "מדעים אופק",      "task": true           },
+          {"subject": "שפה / מתמטיקה",   "task": true           }
+        ],
+        [
+          {"subject": "מתמטיקה",    "task": true            },
+          {"subject": "שפה",        "teacher": "אילת יוסף" },
+          {"subject": "שפה / ספורט","task": true            },
+          {"subject": "מדעים",      "teacher": "רפית טסה"  },
+          {"subject": "ספורט",      "teacher": "נתנאל מדעי"}
+        ],
+        [
+          {"subject": "ספורט",        "teacher": "אוראל עטייה"    },
+          {"subject": "מיינדפולנס",   "teacher": "הגר מיינדפולנס" },
+          {"subject": "מוסיקה",       "teacher": "סופייה משייב"   },
+          {"subject": "אנגלית",       "teacher": "כלנית רז שטראוס"},
+          {"subject": "אומנות שכבתי","teacher": "רווית מזרחי"    }
+        ],
+        [
+          null,
+          null,
+          {"subject": "שרים ביחד", "teacher": "ארתור דיגלו" },
+          {"subject": "שרים ביחד", "teacher": "סופייה משייב"},
+          null
+        ]
+      ]
+    }
+  ]
+}

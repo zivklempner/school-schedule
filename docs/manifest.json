@@ -1,0 +1,14 @@
+{
+  "name": "מערכת למידה מרחוק — כיתה ג׳2",
+  "short_name": "מערכת ג׳2",
+  "description": "מערכת שעות ולמידה מרחוק — כיתה ג׳2 צוות הדר",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ],
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#d4f5e9",
+  "theme_color": "#4ECDC4",
+  "dir": "rtl",
+  "lang": "he"
+}
