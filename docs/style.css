@@ -47,16 +47,66 @@ h1 { font-size: clamp(1.8rem, 6vw, 3rem); font-weight: 900; color: #2c2c2c; line
   background: var(--cream); border-radius: var(--radius);
   box-shadow: var(--shadow); padding: 20px; margin-bottom: 22px; text-align: center;
 }
-.schedule-card h2 { font-size: 1.2rem; font-weight: 700; color: #444; margin-bottom: 14px; }
-#schedule-img, #schedule-placeholder { width: 100%; border-radius: 12px; display: block; }
-#schedule-img { box-shadow: 0 2px 12px rgba(0,0,0,0.14); }
-#schedule-placeholder {
-  height: 260px;
-  background: linear-gradient(135deg, #ffd6cc 0%, #ffeac2 35%, #c2f0e8 65%, #c2deff 100%);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.1rem; font-weight: 700; color: #666;
+.schedule-card h2 { font-size: 1.2rem; font-weight: 700; color: #444; margin-bottom: 6px; }
+.schedule-caption { margin-bottom: 14px; font-size: 0.9rem; color: #888; font-weight: 500; }
+
+/* ── Timetable ─────────────────────────────────────────── */
+.timetable-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; }
+
+.timetable {
+  width: 100%; border-collapse: collapse; min-width: 480px;
+  font-family: 'Rubik', sans-serif;
 }
-.schedule-caption { margin-top: 12px; font-size: 0.95rem; color: #666; font-weight: 500; }
+
+.tt-corner { background: transparent; width: 52px; min-width: 52px; }
+
+.tt-day-header {
+  background: linear-gradient(135deg, var(--coral), #e85555);
+  color: white; font-weight: 700; font-size: 0.95rem;
+  padding: 10px 6px; text-align: center; border: 2px solid white;
+}
+
+.tt-time {
+  background: var(--orange); color: white; font-weight: 700;
+  font-size: 0.85rem; text-align: center; padding: 6px 4px;
+  border: 2px solid white; white-space: nowrap;
+}
+
+.tt-cell {
+  border: 2px solid white; padding: 0; vertical-align: top; min-width: 90px;
+}
+
+.tt-empty { background: #f5f0e8; }
+
+.tt-task {
+  background: linear-gradient(135deg, #fff3cd, #fde9a0);
+  padding: 8px 6px; text-align: center;
+  display: table-cell; vertical-align: middle;
+}
+.tt-task-label {
+  display: block; font-size: 0.65rem; font-weight: 700; color: #b07d00;
+  text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px;
+}
+
+.tt-lesson { background: transparent; }
+
+.tt-link {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; padding: 10px 6px; text-decoration: none; color: white;
+  width: 100%; height: 100%; min-height: 72px;
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+.tt-link:hover { filter: brightness(1.12); transform: scale(1.04); }
+.tt-link:active { transform: scale(0.97); }
+
+.tt-zoom  .tt-link { background: linear-gradient(135deg, #2D8CFF, #1a6fd4); }
+.tt-meet  .tt-link { background: linear-gradient(135deg, #34A853, #1e8c3a); }
+.tt-ytec  .tt-link { background: linear-gradient(135deg, #FF8C00, #e07000); }
+
+.tt-icon    { font-size: 1.1rem; line-height: 1; }
+.tt-teacher { font-size: 0.85rem; font-weight: 700; line-height: 1.2; }
+.tt-subject { font-size: 0.75rem; font-weight: 500; opacity: 0.88; line-height: 1.2; }
+.tt-task .tt-subject { font-size: 0.8rem; font-weight: 600; color: #6b4f00; }
 
 .teachers-card {
   background: var(--cream); border-radius: var(--radius);
