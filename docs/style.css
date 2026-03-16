@@ -35,6 +35,74 @@ a      { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
   --card-shadow: 0 2px 16px rgba(0,0,0,0.45);
 }
 
+/* ── Fun themes (auto-rotate daily) ──────────────────────── */
+body[data-fun="stitch"] {
+  --teal:       #00b4d8;
+  --coral:      #ff69b4;
+  --orange:     #9b59b6;
+  --mint:       #90e0ef;
+  --body-bg:    #caf0f8;
+  --body-check: #ade8f4;
+}
+body[data-fun="maccabi-haifa"] {
+  --teal:       #2d6a2d;
+  --coral:      #4caf50;
+  --orange:     #81c784;
+  --mint:       #c8e6c9;
+  --body-bg:    #e8f5e8;
+  --body-check: #c8e6c9;
+}
+body[data-fun="maccabi-tlv"] {
+  --teal:       #1565c0;
+  --coral:      #f9a825;
+  --orange:     #fdd835;
+  --mint:       #bbdefb;
+  --body-bg:    #fffde7;
+  --body-check: #fff9c4;
+}
+body[data-fun="hapoel-tlv"] {
+  --teal:       #c62828;
+  --coral:      #ef5350;
+  --orange:     #ef9a9a;
+  --mint:       #ffcdd2;
+  --body-bg:    #fff5f5;
+  --body-check: #ffebee;
+}
+body[data-fun="beitar"] {
+  --teal:       #212121;
+  --coral:      #f9a825;
+  --orange:     #fdd835;
+  --mint:       #9e9e9e;
+  --body-bg:    #fffde7;
+  --body-check: #fff9c4;
+}
+body[data-fun="hapoel-pk"] {
+  --teal:       #b71c1c;
+  --coral:      #e53935;
+  --orange:     #81c784;
+  --mint:       #a5d6a7;
+  --body-bg:    #fce4ec;
+  --body-check: #f8bbd0;
+}
+/* Dark mode + fun theme: keep dark backgrounds */
+[data-theme="dark"][data-fun="stitch"]        { --body-bg: #061828; --body-check: #040f1c; }
+[data-theme="dark"][data-fun="maccabi-haifa"] { --body-bg: #0a1f0a; --body-check: #081508; }
+[data-theme="dark"][data-fun="maccabi-tlv"]   { --body-bg: #1a1800; --body-check: #141200; }
+[data-theme="dark"][data-fun="hapoel-tlv"]    { --body-bg: #1f0808; --body-check: #180606; }
+[data-theme="dark"][data-fun="beitar"]        { --body-bg: #1a1800; --body-check: #141200; }
+[data-theme="dark"][data-fun="hapoel-pk"]     { --body-bg: #1f0a0a; --body-check: #180808; }
+
+/* Theme badge */
+.theme-badge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--teal);
+  margin-top: 6px;
+  letter-spacing: 0.02em;
+  min-height: 18px;
+  transition: color 0.3s;
+}
+
 /* ── Body ─────────────────────────────────────────────────── */
 body {
   font-family: 'Rubik', sans-serif;

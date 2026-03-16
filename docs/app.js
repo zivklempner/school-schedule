@@ -369,6 +369,46 @@ function scheduleNotifications(cells) {
   });
 }
 
+// ── Fun themes ─────────────────────────────────────────────
+
+const FUN_THEMES = [
+  { id: 'stitch',        name: '🌊 Lilo & Stitch',    emoji: '🌊 🐠 🌺' },
+  { id: 'maccabi-haifa', name: '💚 מכבי חיפה',          emoji: '💚 ⚽ 🤍' },
+  { id: 'maccabi-tlv',   name: '💛 מכבי תל אביב',       emoji: '💛 ⚽ 💙' },
+  { id: 'hapoel-tlv',    name: '❤️ הפועל תל אביב',       emoji: '❤️ ⚽ 🤍' },
+  { id: 'beitar',        name: '💛 בית"ר ירושלים',      emoji: '💛 ⚽ 🖤' },
+  { id: 'hapoel-pk',     name: '❤️ הפועל פתח תקווה',    emoji: '❤️ ⚽ 💚' },
+];
+
+function applyTheme(idx) {
+  const theme = FUN_THEMES[idx];
+  document.body.setAttribute('data-fun', theme.id);
+  const deco = document.querySelector('.deco-top');
+  if (deco) deco.textContent = theme.emoji;
+  const badge = document.getElementById('theme-badge');
+  if (badge) badge.textContent = theme.name;
+  localStorage.setItem('fun_theme_idx', idx);
+  localStorage.setItem('fun_theme_day', Math.floor(Date.now() / 86400000));
+}
+
+function initTheme() {
+  const today = Math.floor(Date.now() / 86400000);
+  const savedDay = parseInt(localStorage.getItem('fun_theme_day') || '0');
+  const savedIdx = parseInt(localStorage.getItem('fun_theme_idx') || '-1');
+  // Use saved choice if from today, otherwise pick by day-of-year
+  const idx = (savedDay === today && savedIdx >= 0)
+    ? savedIdx
+    : today % FUN_THEMES.length;
+  applyTheme(idx);
+}
+
+function cycleTheme() {
+  const current = parseInt(localStorage.getItem('fun_theme_idx') || '0');
+  const next = (current + 1) % FUN_THEMES.length;
+  applyTheme(next);
+  showToast('🎨 ' + FUN_THEMES[next].name);
+}
+
 // ── Dark mode ──────────────────────────────────────────────
 
 function initDarkMode() {
@@ -466,6 +506,7 @@ function dismissInstallBanner() {
 
 async function init() {
   initDarkMode();
+  initTheme();
   registerSW();
   trackVisit();
 
