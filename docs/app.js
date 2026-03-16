@@ -372,17 +372,48 @@ function scheduleNotifications(cells) {
 // ── Fun themes ─────────────────────────────────────────────
 
 const FUN_THEMES = [
-  { id: 'stitch',        name: '🌊 Lilo & Stitch',      emoji: '🌊 🐠 🌺' },
-  { id: 'maccabi-haifa', name: '💚 מכבי חיפה',            emoji: '💚 ⚽ 🤍' },
-  { id: 'maccabi-tlv',   name: '💛 מכבי תל אביב',         emoji: '💛 ⚽ 💙' },
-  { id: 'hapoel-tlv',    name: '❤️ הפועל תל אביב',         emoji: '❤️ ⚽ 🤍' },
-  { id: 'beitar',        name: '💛 בית"ר ירושלים',        emoji: '💛 ⚽ 🖤' },
-  { id: 'hapoel-pk',     name: '❤️ הפועל פתח תקווה',      emoji: '❤️ ⚽ 💚' },
-  { id: 'real-madrid',   name: '👑 ריאל מדריד',            emoji: '👑 ⚽ 🤍' },
-  { id: 'messi',         name: '🐐 מסי',                  emoji: '🐐 ⚽ 💙' },
-  { id: 'mbappe',        name: '⚡ מבאפה',                 emoji: '⚡ ⚽ 💙' },
-  { id: 'squishmallow',  name: '🧸 Squishmallows',        emoji: '🌸 🧸 🌈' },
+  { id: 'stitch',        name: '🌊 Lilo & Stitch',   emoji: '🌊 🐠 🌺',
+    decos: ['🌊','🌺','🐠','🌴','🐬','🌸','⭐','🌊'] },
+  { id: 'maccabi-haifa', name: '💚 מכבי חיפה',        emoji: '💚 ⚽ 🤍',
+    decos: ['⚽','💚','🏆','🦁','⚽','🌿','💚','🏅'] },
+  { id: 'maccabi-tlv',   name: '💛 מכבי תל אביב',     emoji: '💛 ⚽ 💙',
+    decos: ['⚽','💛','🏆','⭐','💙','🌟','⚽','🥇'] },
+  { id: 'hapoel-tlv',    name: '❤️ הפועל תל אביב',     emoji: '❤️ ⚽ 🤍',
+    decos: ['⚽','❤️','🏆','🔴','⚽','🤍','❤️','🏅'] },
+  { id: 'beitar',        name: '💛 בית"ר ירושלים',    emoji: '💛 ⚽ 🖤',
+    decos: ['⚽','💛','🏆','👑','⭐','🖤','⚽','🌟'] },
+  { id: 'hapoel-pk',     name: '💙 הפועל פתח תקווה',  emoji: '💙 ⚽ 🤍',
+    decos: ['⚽','💙','🏆','🤍','⚽','🔵','💙','🏅'] },
+  { id: 'real-madrid',   name: '👑 ריאל מדריד',        emoji: '👑 ⚽ 🤍',
+    decos: ['👑','⚽','🏆','⭐','🥇','🤍','🏰','🌟'] },
+  { id: 'messi',         name: '🐐 מסי',              emoji: '🐐 ⚽ 💙',
+    decos: ['🐐','⚽','🏆','💙','⭐','🥇','🌟','🎖️'] },
+  { id: 'mbappe',        name: '⚡ מבאפה',             emoji: '⚡ ⚽ 💙',
+    decos: ['⚡','⚽','🏆','💙','🔵','🥇','⚡','🌟'] },
+  { id: 'squishmallow',  name: '🧸 Squishmallows',    emoji: '🌸 🧸 🌈',
+    decos: ['🌸','🧸','🌈','🦄','💜','🌷','🍭','🌟'] },
 ];
+
+// Deco positions: [top%, side, side-value%, fontSize, animDelay]
+const DECO_SLOTS = [
+  ['7%',  'left',  '1%',   '2.4rem', '0s'  ],
+  ['7%',  'right', '0.5%', '2.4rem', '1s'  ],
+  ['27%', 'left',  '0.8%', '2rem',   '0.5s'],
+  ['27%', 'right', '0.5%', '2rem',   '1.8s'],
+  ['50%', 'left',  '1%',   '2.2rem', '2s'  ],
+  ['50%', 'right', '0.5%', '2.2rem', '0.7s'],
+  ['72%', 'left',  '0.8%', '1.8rem', '1.3s'],
+  ['72%', 'right', '0.5%', '1.8rem', '2.4s'],
+];
+
+function renderThemeDecos(theme) {
+  const container = document.getElementById('theme-decos');
+  if (!container) return;
+  const d = theme.decos || [];
+  container.innerHTML = DECO_SLOTS.map(([top, side, sv, size, delay], i) =>
+    `<span class="theme-deco" style="top:${top};${side}:${sv};font-size:${size};animation-delay:${delay};animation-duration:${4 + i * 0.4}s">${d[i] || '⭐'}</span>`
+  ).join('');
+}
 
 function applyTheme(idx) {
   const theme = FUN_THEMES[idx];
@@ -391,6 +422,7 @@ function applyTheme(idx) {
   if (deco) deco.textContent = theme.emoji;
   const badge = document.getElementById('theme-badge');
   if (badge) badge.textContent = theme.name;
+  renderThemeDecos(theme);
   localStorage.setItem('fun_theme_idx', idx);
   localStorage.setItem('fun_theme_day', Math.floor(Date.now() / 86400000));
 }

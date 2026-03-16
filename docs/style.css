@@ -77,12 +77,12 @@ body[data-fun="beitar"] {
   --body-check: #fff9c4;
 }
 body[data-fun="hapoel-pk"] {
-  --teal:       #b71c1c;
-  --coral:      #e53935;
-  --orange:     #81c784;
-  --mint:       #a5d6a7;
-  --body-bg:    #fce4ec;
-  --body-check: #f8bbd0;
+  --teal:       #1565c0;
+  --coral:      #1976d2;
+  --orange:     #42a5f5;
+  --mint:       #bbdefb;
+  --body-bg:    #e3f2fd;
+  --body-check: #bbdefb;
 }
 /* Real Madrid: gold & white */
 body[data-fun="real-madrid"] {
@@ -127,11 +127,35 @@ body[data-fun="squishmallow"] {
 [data-theme="dark"][data-fun="maccabi-tlv"]   { --body-bg: #1a1800; --body-check: #141200; }
 [data-theme="dark"][data-fun="hapoel-tlv"]    { --body-bg: #1f0808; --body-check: #180606; }
 [data-theme="dark"][data-fun="beitar"]        { --body-bg: #1a1800; --body-check: #141200; }
-[data-theme="dark"][data-fun="hapoel-pk"]     { --body-bg: #1f0a0a; --body-check: #180808; }
+[data-theme="dark"][data-fun="hapoel-pk"]     { --body-bg: #061828; --body-check: #040f1c; }
 [data-theme="dark"][data-fun="real-madrid"]  { --body-bg: #1c1800; --body-check: #141200; }
 [data-theme="dark"][data-fun="messi"]        { --body-bg: #061828; --body-check: #040f1c; }
 [data-theme="dark"][data-fun="mbappe"]       { --body-bg: #060d1f; --body-check: #040918; }
 [data-theme="dark"][data-fun="squishmallow"] { --body-bg: #1e0a1e; --body-check: #160816; }
+
+/* ── Theme decorations ───────────────────────────────────── */
+#theme-decos {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.theme-deco {
+  position: absolute;
+  line-height: 1;
+  opacity: 0.55;
+  user-select: none;
+  animation: decoFloat 5s ease-in-out infinite alternate;
+  display: none; /* hidden on mobile */
+}
+@media (min-width: 920px) {
+  .theme-deco { display: block; }
+}
+@keyframes decoFloat {
+  from { transform: translateY(0)    rotate(-6deg); }
+  to   { transform: translateY(-12px) rotate(6deg); }
+}
 
 /* Theme badge */
 .theme-badge {
