@@ -372,12 +372,16 @@ function scheduleNotifications(cells) {
 // ── Fun themes ─────────────────────────────────────────────
 
 const FUN_THEMES = [
-  { id: 'stitch',        name: '🌊 Lilo & Stitch',    emoji: '🌊 🐠 🌺' },
-  { id: 'maccabi-haifa', name: '💚 מכבי חיפה',          emoji: '💚 ⚽ 🤍' },
-  { id: 'maccabi-tlv',   name: '💛 מכבי תל אביב',       emoji: '💛 ⚽ 💙' },
-  { id: 'hapoel-tlv',    name: '❤️ הפועל תל אביב',       emoji: '❤️ ⚽ 🤍' },
-  { id: 'beitar',        name: '💛 בית"ר ירושלים',      emoji: '💛 ⚽ 🖤' },
-  { id: 'hapoel-pk',     name: '❤️ הפועל פתח תקווה',    emoji: '❤️ ⚽ 💚' },
+  { id: 'stitch',        name: '🌊 Lilo & Stitch',      emoji: '🌊 🐠 🌺' },
+  { id: 'maccabi-haifa', name: '💚 מכבי חיפה',            emoji: '💚 ⚽ 🤍' },
+  { id: 'maccabi-tlv',   name: '💛 מכבי תל אביב',         emoji: '💛 ⚽ 💙' },
+  { id: 'hapoel-tlv',    name: '❤️ הפועל תל אביב',         emoji: '❤️ ⚽ 🤍' },
+  { id: 'beitar',        name: '💛 בית"ר ירושלים',        emoji: '💛 ⚽ 🖤' },
+  { id: 'hapoel-pk',     name: '❤️ הפועל פתח תקווה',      emoji: '❤️ ⚽ 💚' },
+  { id: 'real-madrid',   name: '👑 ריאל מדריד',            emoji: '👑 ⚽ 🤍' },
+  { id: 'messi',         name: '🐐 מסי',                  emoji: '🐐 ⚽ 💙' },
+  { id: 'mbappe',        name: '⚡ מבאפה',                 emoji: '⚡ ⚽ 💙' },
+  { id: 'squishmallow',  name: '🧸 Squishmallows',        emoji: '🌸 🧸 🌈' },
 ];
 
 function applyTheme(idx) {

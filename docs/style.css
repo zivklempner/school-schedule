@@ -84,6 +84,43 @@ body[data-fun="hapoel-pk"] {
   --body-bg:    #fce4ec;
   --body-check: #f8bbd0;
 }
+/* Real Madrid: gold & white */
+body[data-fun="real-madrid"] {
+  --teal:       #C9A227;
+  --coral:      #8B0000;
+  --orange:     #FFD700;
+  --mint:       #EAD89C;
+  --body-bg:    #FFFEF0;
+  --body-check: #FFF5CC;
+}
+/* Messi / Argentina: sky blue & gold */
+body[data-fun="messi"] {
+  --teal:       #4A90D9;
+  --coral:      #C9A227;
+  --orange:     #FFD700;
+  --mint:       #B8D4F0;
+  --body-bg:    #E8F4FD;
+  --body-check: #CCE5F8;
+}
+/* Mbappe / France: blue, white, red */
+body[data-fun="mbappe"] {
+  --teal:       #0055A4;
+  --coral:      #EF4135;
+  --orange:     #FF8C42;
+  --mint:       #99B8E0;
+  --body-bg:    #EEF3FF;
+  --body-check: #D8E5FF;
+}
+/* Squishmallows: soft pastel */
+body[data-fun="squishmallow"] {
+  --teal:       #C7B8EA;
+  --coral:      #FFB7C5;
+  --orange:     #FFD0A8;
+  --mint:       #B5EAD7;
+  --body-bg:    #FFF0FB;
+  --body-check: #FFE0F5;
+}
+
 /* Dark mode + fun theme: keep dark backgrounds */
 [data-theme="dark"][data-fun="stitch"]        { --body-bg: #061828; --body-check: #040f1c; }
 [data-theme="dark"][data-fun="maccabi-haifa"] { --body-bg: #0a1f0a; --body-check: #081508; }
@@ -91,6 +128,10 @@ body[data-fun="hapoel-pk"] {
 [data-theme="dark"][data-fun="hapoel-tlv"]    { --body-bg: #1f0808; --body-check: #180606; }
 [data-theme="dark"][data-fun="beitar"]        { --body-bg: #1a1800; --body-check: #141200; }
 [data-theme="dark"][data-fun="hapoel-pk"]     { --body-bg: #1f0a0a; --body-check: #180808; }
+[data-theme="dark"][data-fun="real-madrid"]  { --body-bg: #1c1800; --body-check: #141200; }
+[data-theme="dark"][data-fun="messi"]        { --body-bg: #061828; --body-check: #040f1c; }
+[data-theme="dark"][data-fun="mbappe"]       { --body-bg: #060d1f; --body-check: #040918; }
+[data-theme="dark"][data-fun="squishmallow"] { --body-bg: #1e0a1e; --body-check: #160816; }
 
 /* Theme badge */
 .theme-badge {
