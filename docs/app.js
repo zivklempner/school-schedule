@@ -7,18 +7,18 @@ const CLASS_ID = new URLSearchParams(window.location.search).get('class')
               || 'g32';
 const CLASS_CFG = {
   g32: {
-    subtitle:     "כיתה ג׳2 — צוות הדר",
+    subtitle:     "כיתה ג׳2",
     scheduleFile: './schedule.json',
     imgSrc:       'schedule-g2.jpeg',
     shareUrl:     'https://zivklempner.github.io/g32',
-    shareTitle:   "מערכת ג׳2 — בית ספר הדר"
+    shareTitle:   "מערכת ג׳2"
   },
   g33: {
-    subtitle:     "כיתה ג׳3 — בית ספר הדר",
+    subtitle:     "כיתה ג׳3",
     scheduleFile: './schedule-g33.json',
     imgSrc:       'schedule-g3.jpeg',
     shareUrl:     'https://zivklempner.github.io/g32?class=g33',
-    shareTitle:   "מערכת ג׳3 — בית ספר הדר"
+    shareTitle:   "מערכת ג׳3"
   }
 };
 const CLS = CLASS_CFG[CLASS_ID] || CLASS_CFG.g32;
@@ -84,8 +84,11 @@ function findCurrentWeek(weeks) {
   return past.length ? past[past.length - 1] : sorted[0];
 }
 
-function classifyLink(_url) {
-  return { cls: 'live', icon: '🎥' };
+function classifyLink(url) {
+  if (/ytek-il\.zoom\.us/.test(url)) return { cls: 'ytec', icon: '🎥' };
+  if (/zoom\.us/.test(url))          return { cls: 'zoom', icon: '🎥' };
+  if (/meet\.google\.com/.test(url)) return { cls: 'meet', icon: '📷' };
+  return { cls: 'zoom', icon: '🎥' };
 }
 
 // ── Timetable renderer ─────────────────────────────────────
@@ -490,72 +493,6 @@ function dismissInstallBanner() {
   localStorage.setItem('install_dismissed', '1');
 }
 
-// ── Today view ─────────────────────────────────────────────
-
-function renderTodayView() {
-  const todayView = document.getElementById('today-view');
-  if (!todayView || !_activeCells) return;
-
-  const dayOfWeek = new Date().getDay();
-  if (dayOfWeek > 4) {
-    todayView.innerHTML = '<p class="today-empty">🌟 שבת שלום! אין שיעורים היום</p>';
-    return;
-  }
-
-  const items = [];
-  _activeCells.forEach((row, ti) => {
-    const cell = row[dayOfWeek];
-    if (cell) items.push({ ti, cell });
-  });
-
-  if (items.length === 0) {
-    todayView.innerHTML = '<p class="today-empty">אין שיעורים היום</p>';
-    return;
-  }
-
-  todayView.innerHTML = items.map(({ ti, cell }) => {
-    const time = TIMES[ti];
-    if (cell.task) {
-      return `<a href="${OFEK_URL}" target="_blank" rel="noopener noreferrer" class="today-item today-item--task">
-        <span class="today-time">${time}</span>
-        <span class="today-icon">📝</span>
-        <span class="today-subject">${cell.subject}</span>
-      </a>`;
-    }
-    const url = _links?.[cell.teacher];
-    const inner = `<span class="today-time">${time}</span><span class="today-icon">🎥</span><span class="today-subject">${cell.subject}</span><span class="today-teacher">${cell.teacher.split(' ')[0]}</span>`;
-    if (url) {
-      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="today-item today-item--live"
-        onclick="trackClick('${cell.teacher}'); gcEvent('lesson/${cell.teacher}','${cell.subject}')">
-        ${inner}</a>`;
-    }
-    return `<div class="today-item today-item--live">${inner}</div>`;
-  }).join('');
-}
-
-function setupTodayToggle() {
-  const btn     = document.getElementById('today-toggle');
-  const imgWrap = document.getElementById('schedule-img-wrap');
-  const todayView = document.getElementById('today-view');
-  if (!btn || !imgWrap || !todayView) return;
-
-  let todayOn = false;
-
-  const setOn = (on) => {
-    todayOn = on;
-    imgWrap.style.display   = on ? 'none' : '';
-    todayView.style.display = on ? ''     : 'none';
-    btn.textContent = on ? '📅 כל הימים' : '📍 היום';
-    btn.classList.toggle('active', on);
-    if (on) renderTodayView();
-  };
-
-  btn.addEventListener('click', () => setOn(!todayOn));
-
-  // Auto-on for mobile
-  if (window.matchMedia('(max-width: 600px)').matches) setOn(true);
-}
-
 // ── Class switcher (SPA, no page reload) ───────────────────
 
 function switchClass(classId) {
@@ -647,23 +584,11 @@ async function init() {
   setupShare();
   setupInstallBanner();
 
-  // Teacher grid — show teachers from ALL classes combined
-  const scheduledTeachers = new Set();
-  for (const data of Object.values(_allSchedules)) {
-    for (const w of data.weeks) {
-      for (const row of w.cells) {
-        for (const cell of row) {
-          if (cell?.teacher) scheduledTeachers.add(cell.teacher);
-        }
-      }
-    }
-  }
-
+  // Teacher grid — show all teachers that have a link
   const grid = document.getElementById('teachers-grid');
   grid.innerHTML = '';
   for (const [name, url] of Object.entries(links)) {
     if (!url) continue;
-    if (!scheduledTeachers.has(name)) continue;
     const { cls, icon } = classifyLink(url);
     const a = document.createElement('a');
     a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
