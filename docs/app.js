@@ -33,6 +33,90 @@ const DAYS     = ['ראשון','שני','שלישי','רביעי','חמישי'];
 const TIMES    = ['10:00','10:30','11:00','12:00','13:00'];
 const SLOT_MINS = [[600,630],[630,660],[660,720],[720,780],[780,810]];
 
+// ── Hardcoded schedule data (one array of rows per class) ───
+const SCHEDULE_DATA = {
+  g32: [
+    [ // 10:00
+      { subject: 'רגשי',      teacher: 'רפית טסה'   },
+      { subject: 'מתמטיקה',   teacher: 'רפית טסה'   },
+      { subject: 'רגשי',      teacher: 'רפית טסה'   },
+      { subject: 'שפה',       teacher: 'אילת יוסף'  },
+      { subject: 'רגשי',      teacher: 'רפית טסה'   }
+    ],
+    [ // 10:30
+      { subject: 'מתמטיקה',         teacher: 'רפית טסה' },
+      { subject: 'אומנות / אנגלית', task: true           },
+      { subject: 'מתמטיקה',         teacher: 'רפית טסה' },
+      { subject: 'מדעים אופק',      task: true           },
+      { subject: 'שפה / מתמטיקה',   task: true           }
+    ],
+    [ // 11:00
+      { subject: 'מתמטיקה',     task: true             },
+      { subject: 'שפה',         teacher: 'אילת יוסף'  },
+      { subject: 'שפה / ספורט', task: true             },
+      { subject: 'מדעים',       teacher: 'רפית טסה'   },
+      { subject: 'ספורט',       teacher: 'נתנאל מדעי' }
+    ],
+    [ // 12:00
+      { subject: 'ספורט',         teacher: 'אוראל עטייה'     },
+      { subject: 'מיינדפולנס',    teacher: 'הגר מיינדפולנס'  },
+      { subject: 'מוסיקה',        teacher: 'סופייה משייב'    },
+      { subject: 'אנגלית',        teacher: 'כלנית רז שטראוס' },
+      { subject: 'אומנות שכבתי', teacher: 'רווית מזרחי'     }
+    ],
+    [ // 13:00
+      null,
+      null,
+      { subject: 'שרים ביחד', teacher: 'ארתור דיגלו'  },
+      { subject: 'שרים ביחד', teacher: 'סופייה משייב' },
+      null
+    ]
+  ],
+  g33: [
+    [ // 10:00
+      null,
+      { subject: 'שפה',            teacher: 'נעה טסלר'   },
+      { subject: 'מדעים / אנגלית', teacher: 'סיגלית אורן' },
+      { subject: 'שפה',            teacher: 'נעה טסלר'   },
+      { subject: 'שפה',            teacher: 'נעה טסלר'   }
+    ],
+    [ // 10:30
+      null,
+      { subject: 'מתמטיקה',                       task: true },
+      { subject: 'שפה + ספורט / אנגלית + אמנות', task: true },
+      { subject: 'מדעים',                         task: true },
+      { subject: 'שפה + מתמטיקה',                task: true }
+    ],
+    [ // 11:00
+      { subject: 'מתמטיקה', teacher: 'גלית דרי'    },
+      { subject: 'שפה',     teacher: 'נעה טסלר'    },
+      { subject: 'חברתי',   teacher: 'נעה טסלר'    },
+      { subject: 'מתמטיקה', teacher: 'גלית דרי'    },
+      { subject: 'ספורט',   teacher: 'אוראל עטייה' }
+    ],
+    [ // 12:00
+      { subject: 'ספורט',      teacher: 'אוראל עטייה'    },
+      { subject: 'מיינדפולנס', teacher: 'הגר מיינדפולנס' },
+      { subject: 'מוזיקה',     teacher: 'סופייה משייב'   },
+      { subject: 'מדעים',      teacher: 'סיגלית אורן'    },
+      { subject: 'אומנות',     teacher: 'רווית מזרחי'    }
+    ],
+    [ // 13:00
+      null,
+      null,
+      { subject: 'העשרה שכבות א-ג',     teacher: 'ארתור דיגלו'  },
+      { subject: 'שרים ביחד שכבות ב-ג', teacher: 'סופייה משייב' },
+      null
+    ]
+  ]
+};
+
+// ── Per-class teacher lists ──────────────────────────────────
+const CLASS_TEACHERS = {
+  g32: ['רפית טסה','אילת יוסף','נתנאל מדעי','אוראל עטייה','הגר מיינדפולנס','סופייה משייב','כלנית רז שטראוס','רווית מזרחי','ארתור דיגלו'],
+  g33: ['נעה טסלר','סיגלית אורן','גלית דרי','אוראל עטייה','הגר מיינדפולנס','סופייה משייב','רווית מזרחי','ארתור דיגלו']
+};
+
 // ── GoatCounter event helper (real multi-device analytics) ─
 // Page views are tracked automatically. This tracks clicks.
 function gcEvent(path, title) {
@@ -93,7 +177,9 @@ function classifyLink(url) {
 
 // ── Timetable renderer ─────────────────────────────────────
 
-function renderTimetable(links, cells) {
+function renderScheduleTable(classId) {
+  const cells = SCHEDULE_DATA[classId];
+  if (!cells) return;
   const table = document.getElementById('timetable');
   table.innerHTML = '';
 
@@ -129,17 +215,14 @@ function renderTimetable(links, cells) {
         td.classList.add('tt-empty');
       } else if (cell.task) {
         td.classList.add('tt-task');
-        const a = document.createElement('a');
-        a.href = OFEK_URL; a.target = '_blank'; a.rel = 'noopener noreferrer';
-        a.className = 'tt-task-link';
-        a.innerHTML = `<span class="tt-task-label">📝 משימה</span><span class="tt-subject">${cell.subject}</span>`;
-        a.addEventListener('click', () => { trackClick('📝 ' + cell.subject); gcEvent('task/' + cell.subject, 'Task: ' + cell.subject); });
-        td.appendChild(a);
+        const span = document.createElement('span');
+        span.className = 'tt-task-link';
+        span.innerHTML = `<span class="tt-task-label">📝 משימה</span><span class="tt-subject">${cell.subject}</span>`;
+        td.appendChild(span);
       } else {
-        const url = links[cell.teacher];
-        const { cls, icon } = url ? classifyLink(url) : { cls: 'zoom', icon: '🎥' };
-        td.classList.add('tt-lesson', `tt-${cls}`);
-        const inner = `<span class="tt-icon">${icon}</span><span class="tt-teacher">${cell.teacher.split(' ')[0]}</span><span class="tt-subject">${cell.subject}</span>`;
+        const url = _links ? _links[cell.teacher] : null;
+        td.classList.add('tt-live');
+        const inner = `<span class="tt-icon">🎥</span><span class="tt-teacher">${cell.teacher.split(' ')[0]}</span><span class="tt-subject">${cell.subject}</span>`;
         if (url) {
           const a = document.createElement('a');
           a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
@@ -153,6 +236,24 @@ function renderTimetable(links, cells) {
       tr.appendChild(td);
     });
   });
+}
+
+function renderTeacherGrid(classId) {
+  if (!_links) return;
+  const grid = document.getElementById('teachers-grid');
+  grid.innerHTML = '';
+  const teachers = CLASS_TEACHERS[classId] || [];
+  for (const name of teachers) {
+    const url = _links[name];
+    if (!url) continue;
+    const { cls, icon } = classifyLink(url);
+    const a = document.createElement('a');
+    a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+    a.className = `teacher-btn ${cls}`;
+    a.innerHTML = `<span class="btn-icon">${icon}</span><span class="btn-name">${name}</span>`;
+    a.addEventListener('click', () => { trackClick(name); gcEvent('teacher/' + name, 'Teacher: ' + name); });
+    grid.appendChild(a);
+  }
 }
 
 // ── Live indicator ─────────────────────────────────────────
@@ -511,15 +612,9 @@ function switchClass(classId) {
   if (subtitleEl) subtitleEl.textContent = cfg.subtitle;
   document.title = cfg.shareTitle;
 
-  // Fade → swap image
-  const img = document.getElementById('schedule-img');
-  if (img) {
-    img.classList.add('schedule-img--fading');
-    setTimeout(() => {
-      img.src = cfg.imgSrc;
-      img.classList.remove('schedule-img--fading');
-    }, 200);
-  }
+  // Render schedule table and teacher grid for the selected class
+  renderScheduleTable(classId);
+  renderTeacherGrid(classId);
 
   // Update live indicators for the switched class
   const data = _allSchedules[classId];
@@ -533,9 +628,6 @@ function switchClass(classId) {
       `${fmt(wStart)} – ${fmt(wEnd)} ${wEnd.getFullYear()}`;
     updateLive(_activeCells);
     updateLessonTimer(_activeCells);
-    // Refresh today view if it's currently visible
-    const tv = document.getElementById('today-view');
-    if (tv && tv.style.display !== 'none') renderTodayView();
   }
 }
 
@@ -583,20 +675,6 @@ async function init() {
   setupNotifications(_activeCells || findCurrentWeek(sched32.weeks).cells);
   setupShare();
   setupInstallBanner();
-
-  // Teacher grid — show all teachers that have a link
-  const grid = document.getElementById('teachers-grid');
-  grid.innerHTML = '';
-  for (const [name, url] of Object.entries(links)) {
-    if (!url) continue;
-    const { cls, icon } = classifyLink(url);
-    const a = document.createElement('a');
-    a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
-    a.className = `teacher-btn ${cls}`;
-    a.innerHTML = `<span class="btn-icon">${icon}</span><span class="btn-name">${name}</span>`;
-    a.addEventListener('click', () => { trackClick(name); gcEvent('teacher/' + name, 'Teacher: ' + name); });
-    grid.appendChild(a);
-  }
 }
 
 document.addEventListener('DOMContentLoaded', init);
