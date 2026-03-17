@@ -623,9 +623,11 @@ document.title = cfg.shareTitle;
     const fmt    = d => `${d.getDate()} ${HEBREW_MONTHS[d.getMonth()]}`;
     document.getElementById('week-range').textContent =
       `${fmt(wStart)} – ${fmt(wEnd)} ${wEnd.getFullYear()}`;
-    updateLive(_activeCells);
-    updateLessonTimer(_activeCells);
+  } else {
+    _activeCells = SCHEDULE_DATA[classId];
   }
+  updateLive(_activeCells);
+  updateLessonTimer(_activeCells);
 }
 
 // ── Bootstrap ──────────────────────────────────────────────
