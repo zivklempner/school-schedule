@@ -63,6 +63,7 @@ body {
 .header-card,
 .schedule-card,
 .teachers-card,
+.install-guide-card,
 footer {
   background: var(--cream);
   border-radius: var(--radius);
@@ -649,6 +650,8 @@ footer {
   .tt-teacher { font-size: 0.72rem; }
   .tt-subject  { font-size: 0.62rem; }
 
+  .install-guide-card { display: none; }
+
   /* Force print colors */
   -webkit-print-color-adjust: exact; print-color-adjust: exact;
   .tt-live .tt-link  { background: #2D8CFF !important; }
@@ -656,4 +659,79 @@ footer {
   .tt-day-header     { background: #FF6B6B !important; color: white !important; }
   .tt-day-header.tt-today { background: #4ECDC4 !important; }
   .tt-time           { background: #FFB347 !important; color: white !important; }
+}
+
+/* ── Install guide ─────────────────────────────────────────── */
+.install-guide-card {
+  padding: 20px 20px 16px;
+}
+.install-guide-card > h2 {
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 18px;
+}
+.install-guide-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+@media (max-width: 520px) {
+  .install-guide-grid { grid-template-columns: 1fr; }
+}
+.install-guide-panel {
+  border-radius: var(--radius-sm);
+  padding: 16px 14px;
+  border: 1.5px solid rgba(0,0,0,0.06);
+}
+.install-guide-panel.android {
+  background: #e8f8ef;
+}
+.install-guide-panel.iphone {
+  background: #e8f1fc;
+}
+[data-theme="dark"] .install-guide-panel.android { background: #1a2e22; }
+[data-theme="dark"] .install-guide-panel.iphone  { background: #1a2236; }
+.install-guide-panel h3 {
+  font-size: 0.98rem;
+  font-weight: 900;
+  color: var(--text);
+  margin-bottom: 12px;
+  text-align: center;
+}
+.install-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.install-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--text);
+  line-height: 1.45;
+  counter-increment: step;
+}
+.step-emoji {
+  font-size: 1rem;
+  flex-shrink: 0;
+  width: 1.4em;
+  text-align: center;
+  margin-top: 1px;
+}
+.install-note {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-sub);
+  background: rgba(0,0,0,0.04);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
 }
