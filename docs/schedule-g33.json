@@ -1,0 +1,44 @@
+{
+  "weeks": [
+    {
+      "start": "2026-03-15",
+      "cells": [
+        [
+          null,
+          {"subject": "שפה",             "teacher": "נעה טסלר"      },
+          {"subject": "מדעים / אנגלית",  "teacher": "סיגלית אורן"   },
+          {"subject": "שפה",             "teacher": "נעה טסלר"      },
+          {"subject": "שפה",             "teacher": "נעה טסלר"      }
+        ],
+        [
+          null,
+          {"subject": "מתמטיקה",                        "task": true },
+          {"subject": "שפה + ספורט / אנגלית + אמנות",  "task": true },
+          {"subject": "מדעים",                          "task": true },
+          {"subject": "שפה + מתמטיקה",                 "task": true }
+        ],
+        [
+          {"subject": "מתמטיקה", "teacher": "גלית דרי"         },
+          {"subject": "שפה",     "teacher": "נעה טסלר"         },
+          {"subject": "חברתי",   "teacher": "נעה טסלר"         },
+          {"subject": "מתמטיקה", "teacher": "גלית דרי"         },
+          {"subject": "ספורט",   "teacher": "אוראל עטייה"      }
+        ],
+        [
+          {"subject": "ספורט",     "teacher": "אוראל עטייה"    },
+          {"subject": "מיינדפולנס","teacher": "הגר מיינדפולנס" },
+          {"subject": "מוזיקה",    "teacher": "סופייה משייב"   },
+          {"subject": "מדעים",     "teacher": "סיגלית אורן"    },
+          {"subject": "אומנות",    "teacher": "רווית מזרחי"    }
+        ],
+        [
+          null,
+          null,
+          {"subject": "העשרה שכבות א-ג",   "teacher": "ארתור דיגלו"  },
+          {"subject": "שרים ביחד שכבות ב-ג","teacher": "סופייה משייב"},
+          null
+        ]
+      ]
+    }
+  ]
+}

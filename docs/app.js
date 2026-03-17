@@ -1,6 +1,33 @@
 const HEBREW_MONTHS = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
-const OFEK_URL  = 'https://myofek.cet.ac.il/';
-const SHARE_URL = 'https://zivklempner.github.io/g32';
+const OFEK_URL = 'https://myofek.cet.ac.il/';
+
+// ── Multi-class support ─────────────────────────────────────
+const CLASS_ID = new URLSearchParams(window.location.search).get('class')
+              || localStorage.getItem('selectedClass')
+              || 'g32';
+const CLASS_CFG = {
+  g32: {
+    subtitle:     "כיתה ג׳2 — צוות הדר",
+    scheduleFile: './schedule.json',
+    imgSrc:       'schedule-g2.jpeg',
+    shareUrl:     'https://zivklempner.github.io/g32',
+    shareTitle:   "מערכת ג׳2 — בית ספר הדר"
+  },
+  g33: {
+    subtitle:     "כיתה ג׳3 — בית ספר הדר",
+    scheduleFile: './schedule-g33.json',
+    imgSrc:       'schedule-g3.jpeg',
+    shareUrl:     'https://zivklempner.github.io/g32?class=g33',
+    shareTitle:   "מערכת ג׳3 — בית ספר הדר"
+  }
+};
+const CLS = CLASS_CFG[CLASS_ID] || CLASS_CFG.g32;
+const SHARE_URL = CLS.shareUrl;
+
+// Active schedule cells (updated on class switch)
+let _activeCells = null;
+let _links = null;
+const _allSchedules = {};
 
 const DAYS     = ['ראשון','שני','שלישי','רביעי','חמישי'];
 const TIMES    = ['10:00','10:30','11:00','12:00','13:00'];
@@ -290,15 +317,16 @@ function setupTodayToggle(autoOn) {
 function setupShare() {
   const btn = document.getElementById('share-btn');
   btn.addEventListener('click', async () => {
+    const cfg = CLASS_CFG[localStorage.getItem('selectedClass') || CLASS_ID] || CLS;
     if (navigator.share) {
-      try { await navigator.share({ title: 'מערכת ג׳2 — צוות הדר', url: SHARE_URL }); return; }
+      try { await navigator.share({ title: cfg.shareTitle, url: cfg.shareUrl }); return; }
       catch { /* cancelled */ }
     }
     try {
-      await navigator.clipboard.writeText(SHARE_URL);
+      await navigator.clipboard.writeText(cfg.shareUrl);
       showToast('🔗 הקישור הועתק!');
     } catch {
-      showToast(SHARE_URL);
+      showToast(cfg.shareUrl);
     }
   });
 }
@@ -462,6 +490,118 @@ function dismissInstallBanner() {
   localStorage.setItem('install_dismissed', '1');
 }
 
+// ── Today view ─────────────────────────────────────────────
+
+function renderTodayView() {
+  const todayView = document.getElementById('today-view');
+  if (!todayView || !_activeCells) return;
+
+  const dayOfWeek = new Date().getDay();
+  if (dayOfWeek > 4) {
+    todayView.innerHTML = '<p class="today-empty">🌟 שבת שלום! אין שיעורים היום</p>';
+    return;
+  }
+
+  const items = [];
+  _activeCells.forEach((row, ti) => {
+    const cell = row[dayOfWeek];
+    if (cell) items.push({ ti, cell });
+  });
+
+  if (items.length === 0) {
+    todayView.innerHTML = '<p class="today-empty">אין שיעורים היום</p>';
+    return;
+  }
+
+  todayView.innerHTML = items.map(({ ti, cell }) => {
+    const time = TIMES[ti];
+    if (cell.task) {
+      return `<a href="${OFEK_URL}" target="_blank" rel="noopener noreferrer" class="today-item today-item--task">
+        <span class="today-time">${time}</span>
+        <span class="today-icon">📝</span>
+        <span class="today-subject">${cell.subject}</span>
+      </a>`;
+    }
+    const url = _links?.[cell.teacher];
+    const inner = `<span class="today-time">${time}</span><span class="today-icon">🎥</span><span class="today-subject">${cell.subject}</span><span class="today-teacher">${cell.teacher.split(' ')[0]}</span>`;
+    if (url) {
+      return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="today-item today-item--live"
+        onclick="trackClick('${cell.teacher}'); gcEvent('lesson/${cell.teacher}','${cell.subject}')">
+        ${inner}</a>`;
+    }
+    return `<div class="today-item today-item--live">${inner}</div>`;
+  }).join('');
+}
+
+function setupTodayToggle() {
+  const btn     = document.getElementById('today-toggle');
+  const imgWrap = document.getElementById('schedule-img-wrap');
+  const todayView = document.getElementById('today-view');
+  if (!btn || !imgWrap || !todayView) return;
+
+  let todayOn = false;
+
+  const setOn = (on) => {
+    todayOn = on;
+    imgWrap.style.display   = on ? 'none' : '';
+    todayView.style.display = on ? ''     : 'none';
+    btn.textContent = on ? '📅 כל הימים' : '📍 היום';
+    btn.classList.toggle('active', on);
+    if (on) renderTodayView();
+  };
+
+  btn.addEventListener('click', () => setOn(!todayOn));
+
+  // Auto-on for mobile
+  if (window.matchMedia('(max-width: 600px)').matches) setOn(true);
+}
+
+// ── Class switcher (SPA, no page reload) ───────────────────
+
+function switchClass(classId) {
+  const cfg = CLASS_CFG[classId];
+  if (!cfg) return;
+
+  localStorage.setItem('selectedClass', classId);
+  history.replaceState(null, '', classId === 'g32' ? './' : '?class=' + classId);
+
+  // Dropdown
+  const sel = document.getElementById('class-select');
+  if (sel) sel.value = classId;
+
+  // Subtitle + title
+  const subtitleEl = document.getElementById('class-subtitle');
+  if (subtitleEl) subtitleEl.textContent = cfg.subtitle;
+  document.title = cfg.shareTitle;
+
+  // Fade → swap image
+  const img = document.getElementById('schedule-img');
+  if (img) {
+    img.classList.add('schedule-img--fading');
+    setTimeout(() => {
+      img.src = cfg.imgSrc;
+      img.classList.remove('schedule-img--fading');
+    }, 200);
+  }
+
+  // Update live indicators for the switched class
+  const data = _allSchedules[classId];
+  if (data) {
+    const week = findCurrentWeek(data.weeks);
+    _activeCells = week.cells;
+    const wStart = parseLocalDate(week.start);
+    const wEnd   = new Date(wStart); wEnd.setDate(wStart.getDate() + 4);
+    const fmt    = d => `${d.getDate()} ${HEBREW_MONTHS[d.getMonth()]}`;
+    document.getElementById('week-range').textContent =
+      `${fmt(wStart)} – ${fmt(wEnd)} ${wEnd.getFullYear()}`;
+    updateLive(_activeCells);
+    updateLessonTimer(_activeCells);
+    // Refresh today view if it's currently visible
+    const tv = document.getElementById('today-view');
+    if (tv && tv.style.display !== 'none') renderTodayView();
+  }
+}
+
 // ── Bootstrap ──────────────────────────────────────────────
 
 async function init() {
@@ -469,45 +609,52 @@ async function init() {
   registerSW();
   trackVisit();
 
-  let links, scheduleData;
+  // Wire dropdown (before fetch so it's ready immediately)
+  const sel = document.getElementById('class-select');
+  if (sel) sel.addEventListener('change', () => switchClass(sel.value));
+
+  // Load both schedules + links in parallel
+  let links, sched32, sched33;
   try {
-    const [lr, sr] = await Promise.all([fetch('links.json'), fetch('schedule.json')]);
-    if (!lr.ok || !sr.ok) throw new Error();
-    [links, scheduleData] = await Promise.all([lr.json(), sr.json()]);
+    const [lr, s2r, s3r] = await Promise.all([
+      fetch('./links.json'),
+      fetch('./schedule.json'),
+      fetch('./schedule-g33.json')
+    ]);
+    if (!lr.ok || !s2r.ok) throw new Error();
+    [links, sched32] = await Promise.all([lr.json(), s2r.json()]);
+    if (s3r.ok) sched33 = await s3r.json();
   } catch {
     document.getElementById('teachers-grid').innerHTML =
       '<p style="color:#c00;text-align:center">שגיאה בטעינת הנתונים.</p>';
     return;
   }
 
-  const week  = findCurrentWeek(scheduleData.weeks);
-  const cells = week.cells;
+  _allSchedules.g32 = sched32;
+  if (sched33) _allSchedules.g33 = sched33;
+  _links = links;
 
-  const wStart = parseLocalDate(week.start);
-  const wEnd   = new Date(wStart); wEnd.setDate(wStart.getDate() + 4);
-  const fmt = d => `${d.getDate()} ${HEBREW_MONTHS[d.getMonth()]}`;
-  document.getElementById('week-range').textContent =
-    `${fmt(wStart)} – ${fmt(wEnd)} ${wEnd.getFullYear()}`;
+  // Initialize selected class (sets image, subtitle, title, week-range, pills)
+  switchClass(CLASS_ID);
+  setupTodayToggle();
 
-  renderTimetable(links, cells);
-  updateLive(cells);
-  setInterval(() => updateLive(cells), 60_000);
+  // Live indicator intervals — always read from _activeCells (updated by switchClass)
+  setInterval(() => { if (_activeCells) updateLive(_activeCells); }, 60_000);
+  setInterval(() => { if (_activeCells) updateLessonTimer(_activeCells); }, 1_000);
 
-  updateLessonTimer(cells);
-  setInterval(() => updateLessonTimer(cells), 1_000);
-
-  const isMobile = window.matchMedia('(max-width: 600px)').matches;
-  setupTodayToggle(isMobile);
-  setupNotifications(cells);
+  // Notifications use initial class (re-scheduling on switch would double-fire)
+  setupNotifications(_activeCells || findCurrentWeek(sched32.weeks).cells);
   setupShare();
   setupInstallBanner();
 
-  // Collect every teacher that appears in any week's schedule
+  // Teacher grid — show teachers from ALL classes combined
   const scheduledTeachers = new Set();
-  for (const w of scheduleData.weeks) {
-    for (const row of w.cells) {
-      for (const cell of row) {
-        if (cell?.teacher) scheduledTeachers.add(cell.teacher);
+  for (const data of Object.values(_allSchedules)) {
+    for (const w of data.weeks) {
+      for (const row of w.cells) {
+        for (const cell of row) {
+          if (cell?.teacher) scheduledTeachers.add(cell.teacher);
+        }
       }
     }
   }

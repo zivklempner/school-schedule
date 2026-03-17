@@ -35,7 +35,14 @@
         </div>
       </div>
       <h1>מערכת למידה מרחוק</h1>
-      <div class="subtitle">כיתה ג׳2 — צוות הדר</div>
+      <div class="class-switcher">
+        <label class="class-label" for="class-select">בחרו כיתה:</label>
+        <select id="class-select" class="class-select">
+          <option value="g32">כיתה ג׳2 — צוות הדר</option>
+          <option value="g33">כיתה ג׳3 — בית ספר הדר</option>
+        </select>
+      </div>
+      <div class="subtitle" id="class-subtitle">כיתה ג׳2 — בית ספר הדר</div>
       <div class="header-meta">
         <span class="week-range" id="week-range">…</span>
         <span class="now-pill"  id="now-pill"    style="display:none">…</span>
@@ -58,18 +65,14 @@
           <button class="action-btn coral-btn" onclick="window.print()" aria-label="הדפס">🖨️</button>
         </div>
       </div>
-      <div class="tt-legend">
-        <span class="legend-item legend-live">🎥 שיעור מקוון</span>
-        <span class="legend-item legend-task">📝 משימה</span>
+      <div class="schedule-img-wrap" id="schedule-img-wrap">
+        <img id="schedule-img" class="schedule-img" src="schedule-g2.jpeg" alt="מערכת שעות" />
       </div>
-      <p class="schedule-caption">לחצו על שיעור להצטרפות</p>
-      <div class="timetable-wrap">
-        <table class="timetable" id="timetable"></table>
-      </div>
+      <div id="today-view" class="today-view" style="display:none"></div>
     </section>
 
     <section class="teachers-card">
-      <h2>🔗 כל הקישורים</h2>
+      <h2>🔗 קישורי המורים — כל הכיתות</h2>
       <div class="teachers-grid" id="teachers-grid">
         <p class="loading-msg">טוען קישורים…</p>
       </div>
