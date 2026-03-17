@@ -74,25 +74,25 @@ const SCHEDULE_DATA = {
   ],
   g4: [
     [ // 10:00
-      null,
-      { subject: 'שפה',            teacher: 'נעה טסלר'   },
-      { subject: 'מדעים / אנגלית', teacher: 'סיגלית אורן' },
-      { subject: 'שפה',            teacher: 'נעה טסלר'   },
-      { subject: 'שפה',            teacher: 'נעה טסלר'   }
+      { subject: 'שפה',    teacher: 'נעה שחמון'        },
+      { subject: 'אנגלית', teacher: 'כלנית רז שטראוס'  },
+      { subject: 'מדעים',  teacher: 'סיגלית אורן'      },
+      { subject: 'שפה',    teacher: 'נעה שחמון'        },
+      { subject: 'שפה',    teacher: 'נעה שחמון'        }
     ],
     [ // 10:30
-      null,
-      { subject: 'מתמטיקה',                       task: true },
-      { subject: 'שפה + ספורט / אנגלית + אמנות', task: true },
-      { subject: 'מדעים',                         task: true },
-      { subject: 'שפה + מתמטיקה',                task: true }
+      { subject: 'מתמטיקה',       task: true },
+      { subject: 'אנגלית + אומנות', task: true },
+      { subject: 'שפה + ספורט',   task: true },
+      { subject: 'מדעים',         task: true },
+      { subject: 'שפה + מתמטיקה', task: true }
     ],
     [ // 11:00
-      { subject: 'מתמטיקה', teacher: 'גלית דרי'    },
-      { subject: 'שפה',     teacher: 'נעה טסלר'    },
-      { subject: 'חברתי',   teacher: 'נעה טסלר'    },
-      { subject: 'מתמטיקה', teacher: 'גלית דרי'    },
-      { subject: 'ספורט',   teacher: 'אוראל עטייה' }
+      { subject: 'מתמטיקה', teacher: 'גלית דרי'       },
+      { subject: 'שפה',     teacher: 'נעה שחמון'      },
+      { subject: 'חברתי',   teacher: 'נעה שחמון'      },
+      { subject: 'מתמטיקה', teacher: 'גלית דרי'       },
+      { subject: 'ספורט',   teacher: 'אוראל עטייה'    }
     ],
     [ // 12:00
       { subject: 'ספורט',      teacher: 'אוראל עטייה'    },
@@ -114,7 +114,7 @@ const SCHEDULE_DATA = {
 // ── Per-class teacher lists ──────────────────────────────────
 const CLASS_TEACHERS = {
   g32: ['רפית טסה','אילת יוסף','נתנאל מדעי','אוראל עטייה','הגר מיינדפולנס','סופייה משייב','כלנית רז שטראוס','רווית מזרחי','ארתור דיגלו'],
-  g4: ['נעה טסלר','סיגלית אורן','גלית דרי','אוראל עטייה','הגר מיינדפולנס','סופייה משייב','רווית מזרחי','ארתור דיגלו']
+  g4: ['נעה שחמון','כלנית רז שטראוס','סיגלית אורן','גלית דרי','אוראל עטייה','הגר מיינדפולנס','סופייה משייב','רווית מזרחי','ארתור דיגלו']
 };
 
 // ── GoatCounter event helper (real multi-device analytics) ─
