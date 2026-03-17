@@ -13,12 +13,12 @@ const CLASS_CFG = {
     shareUrl:     'https://zivklempner.github.io/g32',
     shareTitle:   "מערכת ג׳2"
   },
-  g33: {
-    subtitle:     "כיתה ג׳3",
-    scheduleFile: './schedule-g33.json',
-    imgSrc:       'schedule-g3.jpeg',
-    shareUrl:     'https://zivklempner.github.io/g32?class=g33',
-    shareTitle:   "מערכת ג׳3"
+  g34: {
+    subtitle:     "כיתה ג׳4",
+    scheduleFile: './schedule-g34.json',
+    imgSrc:       'schedule-g4.jpeg',
+    shareUrl:     'https://zivklempner.github.io/g32?class=g34',
+    shareTitle:   "מערכת ג׳4"
   }
 };
 const CLS = CLASS_CFG[CLASS_ID] || CLASS_CFG.g32;
@@ -72,7 +72,7 @@ const SCHEDULE_DATA = {
       null
     ]
   ],
-  g33: [
+  g34: [
     [ // 10:00
       null,
       { subject: 'שפה',            teacher: 'נעה טסלר'   },
@@ -114,7 +114,7 @@ const SCHEDULE_DATA = {
 // ── Per-class teacher lists ──────────────────────────────────
 const CLASS_TEACHERS = {
   g32: ['רפית טסה','אילת יוסף','נתנאל מדעי','אוראל עטייה','הגר מיינדפולנס','סופייה משייב','כלנית רז שטראוס','רווית מזרחי','ארתור דיגלו'],
-  g33: ['נעה טסלר','סיגלית אורן','גלית דרי','אוראל עטייה','הגר מיינדפולנס','סופייה משייב','רווית מזרחי','ארתור דיגלו']
+  g34: ['נעה טסלר','סיגלית אורן','גלית דרי','אוראל עטייה','הגר מיינדפולנס','סופייה משייב','רווית מזרחי','ארתור דיגלו']
 };
 
 // ── GoatCounter event helper (real multi-device analytics) ─
@@ -246,11 +246,10 @@ function renderTeacherGrid(classId) {
   for (const name of teachers) {
     const url = _links[name];
     if (!url) continue;
-    const { cls, icon } = classifyLink(url);
     const a = document.createElement('a');
     a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
-    a.className = `teacher-btn ${cls}`;
-    a.innerHTML = `<span class="btn-icon">${icon}</span><span class="btn-name">${name}</span>`;
+    a.className = 'teacher-btn zoom';
+    a.innerHTML = `<span class="btn-icon">🎥</span><span class="btn-name">${name}</span>`;
     a.addEventListener('click', () => { trackClick(name); gcEvent('teacher/' + name, 'Teacher: ' + name); });
     grid.appendChild(a);
   }
@@ -638,21 +637,31 @@ async function init() {
   registerSW();
   trackVisit();
 
-  // Wire dropdown (before fetch so it's ready immediately)
-  const sel = document.getElementById('class-select');
-  if (sel) sel.addEventListener('change', () => switchClass(sel.value));
+  // Resolve effective class (guard against stale localStorage values)
+  const effectiveClassId = SCHEDULE_DATA[CLASS_ID] ? CLASS_ID : 'g32';
 
-  // Load both schedules + links in parallel
-  let links, sched32, sched33;
+  // Wire dropdown + sync its value before anything async
+  const sel = document.getElementById('class-select');
+  if (sel) {
+    sel.value = effectiveClassId;
+    sel.addEventListener('change', () => switchClass(sel.value));
+  }
+
+  // Render the schedule table immediately from hardcoded data (no fetch needed)
+  renderScheduleTable(effectiveClassId);
+  setupTodayToggle();
+
+  // Load both schedules + links in parallel (for clickable links + live indicators)
+  let links, sched32, sched34;
   try {
-    const [lr, s2r, s3r] = await Promise.all([
+    const [lr, s2r, s4r] = await Promise.all([
       fetch('./links.json'),
       fetch('./schedule.json'),
-      fetch('./schedule-g33.json')
+      fetch('./schedule-g34.json')
     ]);
     if (!lr.ok || !s2r.ok) throw new Error();
     [links, sched32] = await Promise.all([lr.json(), s2r.json()]);
-    if (s3r.ok) sched33 = await s3r.json();
+    if (s4r.ok) sched34 = await s4r.json();
   } catch {
     document.getElementById('teachers-grid').innerHTML =
       '<p style="color:#c00;text-align:center">שגיאה בטעינת הנתונים.</p>';
@@ -660,12 +669,11 @@ async function init() {
   }
 
   _allSchedules.g32 = sched32;
-  if (sched33) _allSchedules.g33 = sched33;
+  if (sched34) _allSchedules.g34 = sched34;
   _links = links;
 
-  // Initialize selected class (sets image, subtitle, title, week-range, pills)
-  switchClass(CLASS_ID);
-  setupTodayToggle();
+  // Re-render with clickable links + update subtitle/title/week-range/pills
+  switchClass(effectiveClassId);
 
   // Live indicator intervals — always read from _activeCells (updated by switchClass)
   setInterval(() => { if (_activeCells) updateLive(_activeCells); }, 60_000);
