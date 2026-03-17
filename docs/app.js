@@ -13,11 +13,11 @@ const CLASS_CFG = {
     shareUrl:     'https://zivklempner.github.io/g32',
     shareTitle:   "מערכת ג׳2"
   },
-  g34: {
+  g4: {
     subtitle:     "כיתה ג׳4",
-    scheduleFile: './schedule-g34.json',
+    scheduleFile: './schedule-g4.json',
     imgSrc:       'schedule-g4.jpeg',
-    shareUrl:     'https://zivklempner.github.io/g32?class=g34',
+    shareUrl:     'https://zivklempner.github.io/g32?class=g4',
     shareTitle:   "מערכת ג׳4"
   }
 };
@@ -72,7 +72,7 @@ const SCHEDULE_DATA = {
       null
     ]
   ],
-  g34: [
+  g4: [
     [ // 10:00
       null,
       { subject: 'שפה',            teacher: 'נעה טסלר'   },
@@ -114,7 +114,7 @@ const SCHEDULE_DATA = {
 // ── Per-class teacher lists ──────────────────────────────────
 const CLASS_TEACHERS = {
   g32: ['רפית טסה','אילת יוסף','נתנאל מדעי','אוראל עטייה','הגר מיינדפולנס','סופייה משייב','כלנית רז שטראוס','רווית מזרחי','ארתור דיגלו'],
-  g34: ['נעה טסלר','סיגלית אורן','גלית דרי','אוראל עטייה','הגר מיינדפולנס','סופייה משייב','רווית מזרחי','ארתור דיגלו']
+  g4: ['נעה טסלר','סיגלית אורן','גלית דרי','אוראל עטייה','הגר מיינדפולנס','סופייה משייב','רווית מזרחי','ארתור דיגלו']
 };
 
 // ── GoatCounter event helper (real multi-device analytics) ─
@@ -607,9 +607,7 @@ function switchClass(classId) {
   if (sel) sel.value = classId;
 
   // Subtitle + title
-  const subtitleEl = document.getElementById('class-subtitle');
-  if (subtitleEl) subtitleEl.textContent = cfg.subtitle;
-  document.title = cfg.shareTitle;
+document.title = cfg.shareTitle;
 
   // Render schedule table and teacher grid for the selected class
   renderScheduleTable(classId);
@@ -657,7 +655,7 @@ async function init() {
     const [lr, s2r, s4r] = await Promise.all([
       fetch('./links.json'),
       fetch('./schedule.json'),
-      fetch('./schedule-g34.json')
+      fetch('./schedule-g4.json')
     ]);
     if (!lr.ok || !s2r.ok) throw new Error();
     [links, sched32] = await Promise.all([lr.json(), s2r.json()]);
@@ -669,7 +667,7 @@ async function init() {
   }
 
   _allSchedules.g32 = sched32;
-  if (sched34) _allSchedules.g34 = sched34;
+  if (sched34) _allSchedules.g4 = sched34;
   _links = links;
 
   // Re-render with clickable links + update subtitle/title/week-range/pills
