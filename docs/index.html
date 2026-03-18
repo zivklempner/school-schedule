@@ -32,6 +32,7 @@
         <div class="header-top-actions">
           <button class="icon-btn notify-btn" id="notify-btn" style="display:none" title="הפעל התראות">🔔</button>
           <button class="icon-btn" id="share-btn" title="שתף קישור">📤</button>
+          <button class="icon-btn" id="install-help-btn" title="איך מתקינים את האפליקציה">📲</button>
         </div>
       </div>
       <h1>מערכת למידה מרחוק</h1>
@@ -55,45 +56,6 @@
         <span class="lesson-timer-pct" id="lesson-timer-pct"></span>
       </div>
     </header>
-
-    <section class="install-guide-card">
-      <h2>📲 איך מתקינים את האפליקציה על הטלפון?</h2>
-      <div class="install-guide-accordions">
-
-        <details class="install-accordion android">
-          <summary>
-            <span class="install-platform-icon">🤖</span>
-            <span class="install-platform-name">התקנה על אנדרואיד (Chrome)</span>
-            <span class="install-chevron" aria-hidden="true">▾</span>
-          </summary>
-          <ol class="install-steps">
-            <li><span class="step-emoji">🌐</span> פתחו את Chrome על האנדרואיד</li>
-            <li><span class="step-emoji">⋮</span> לחצו על שלוש הנקודות האנכיות בפינה הימנית העליונה</li>
-            <li><span class="step-emoji">➕</span> גללו למטה ובחרו "הוסף למסך הבית"</li>
-            <li><span class="step-emoji">✏️</span> תנו שם לקיצור הדרך (אופציונלי) ולחצו "הוסף"</li>
-            <li><span class="step-emoji">🏠</span> האפליקציה תופיע על מסך הבית</li>
-          </ol>
-        </details>
-
-        <details class="install-accordion iphone">
-          <summary>
-            <span class="install-platform-icon">📱</span>
-            <span class="install-platform-name">התקנה על אייפון (Chrome / Safari)</span>
-            <span class="install-chevron" aria-hidden="true">▾</span>
-          </summary>
-          <ol class="install-steps">
-            <li><span class="step-emoji">🌐</span> פתחו את הדפדפן (Chrome או Safari)</li>
-            <li><span class="step-emoji">⬆️</span> לחצו על כפתור השיתוף (ריבוע עם חץ למעלה)</li>
-            <li><span class="step-emoji">📋</span> לחצו על "הצג עוד" לפתיחת אפשרויות נוספות</li>
-            <li><span class="step-emoji">➕</span> לחצו על "הוסף למסך הבית"</li>
-            <li><span class="step-emoji">✏️</span> ערכו את השם (אופציונלי) ולחצו "הוסף"</li>
-            <li><span class="step-emoji">🏠</span> האייקון של האפליקציה יופיע על מסך הבית</li>
-          </ol>
-        </details>
-
-      </div>
-      <p class="install-note">💡 מומלץ להשתמש בדפדפן Chrome לחוויה הטובה ביותר</p>
-    </section>
 
     <section class="schedule-card">
       <div class="schedule-card-header">
@@ -130,6 +92,50 @@
     </footer>
 
   </div>
+
+  <!-- Install guide modal -->
+  <div class="install-modal-overlay" id="install-modal" role="dialog" aria-modal="true" aria-label="הוראות התקנה" hidden>
+    <div class="install-modal">
+      <button class="install-modal-close" id="install-modal-close" aria-label="סגור">✕</button>
+      <h2>📲 איך מתקינים את האפליקציה?</h2>
+      <div class="install-guide-accordions">
+
+        <details class="install-accordion android">
+          <summary>
+            <span class="install-platform-icon">🤖</span>
+            <span class="install-platform-name">התקנה על אנדרואיד (Chrome)</span>
+            <span class="install-chevron" aria-hidden="true">▾</span>
+          </summary>
+          <ol class="install-steps">
+            <li><span class="step-emoji">🌐</span> פתחו את Chrome על האנדרואיד</li>
+            <li><span class="step-emoji">⋮</span> לחצו על שלוש הנקודות האנכיות בפינה הימנית העליונה</li>
+            <li><span class="step-emoji">➕</span> גללו למטה ובחרו "הוסף למסך הבית"</li>
+            <li><span class="step-emoji">✏️</span> תנו שם לקיצור הדרך (אופציונלי) ולחצו "הוסף"</li>
+            <li><span class="step-emoji">🏠</span> האפליקציה תופיע על מסך הבית</li>
+          </ol>
+        </details>
+
+        <details class="install-accordion iphone">
+          <summary>
+            <span class="install-platform-icon">📱</span>
+            <span class="install-platform-name">התקנה על אייפון (Chrome / Safari)</span>
+            <span class="install-chevron" aria-hidden="true">▾</span>
+          </summary>
+          <ol class="install-steps">
+            <li><span class="step-emoji">🌐</span> פתחו את הדפדפן (Chrome או Safari)</li>
+            <li><span class="step-emoji">⬆️</span> לחצו על כפתור השיתוף (ריבוע עם חץ למעלה)</li>
+            <li><span class="step-emoji">📋</span> לחצו על "הצג עוד" לפתיחת אפשרויות נוספות</li>
+            <li><span class="step-emoji">➕</span> לחצו על "הוסף למסך הבית"</li>
+            <li><span class="step-emoji">✏️</span> ערכו את השם (אופציונלי) ולחצו "הוסף"</li>
+            <li><span class="step-emoji">🏠</span> האייקון של האפליקציה יופיע על מסך הבית</li>
+          </ol>
+        </details>
+
+      </div>
+      <p class="install-note">💡 מומלץ להשתמש בדפדפן Chrome לחוויה הטובה ביותר</p>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>

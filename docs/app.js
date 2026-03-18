@@ -222,7 +222,7 @@ function renderScheduleTable(classId) {
       } else {
         const url = _links ? _links[cell.teacher] : null;
         td.classList.add('tt-live');
-        const inner = `<span class="tt-icon">🎥</span><span class="tt-teacher">${cell.teacher.split(' ')[0]}</span><span class="tt-subject">${cell.subject}</span>`;
+        const inner = `<span class="tt-subject">${cell.subject}</span><span class="tt-teacher">${cell.teacher.split(' ')[0]}</span>`;
         if (url) {
           const a = document.createElement('a');
           a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
@@ -630,6 +630,23 @@ document.title = cfg.shareTitle;
   updateLessonTimer(_activeCells);
 }
 
+// ── Install modal ──────────────────────────────────────────
+
+function setupInstallModal() {
+  const overlay = document.getElementById('install-modal');
+  const openBtn = document.getElementById('install-help-btn');
+  const closeBtn = document.getElementById('install-modal-close');
+  if (!overlay || !openBtn) return;
+
+  const open  = () => { overlay.hidden = false; document.body.style.overflow = 'hidden'; };
+  const close = () => { overlay.hidden = true;  document.body.style.overflow = ''; };
+
+  openBtn.addEventListener('click', open);
+  closeBtn?.addEventListener('click', close);
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !overlay.hidden) close(); });
+}
+
 // ── Bootstrap ──────────────────────────────────────────────
 
 async function init() {
@@ -683,6 +700,7 @@ async function init() {
   setupNotifications(_activeCells || findCurrentWeek(sched32.weeks).cells);
   setupShare();
   setupInstallBanner();
+  setupInstallModal();
 }
 
 document.addEventListener('DOMContentLoaded', init);
