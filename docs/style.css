@@ -663,61 +663,94 @@ footer {
 
 /* ── Install guide ─────────────────────────────────────────── */
 .install-guide-card {
-  padding: 20px 20px 16px;
+  padding: 18px 18px 14px;
 }
 .install-guide-card > h2 {
   font-size: 1.1rem;
   font-weight: 900;
   color: var(--text);
   text-align: center;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
-.install-guide-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
+.install-guide-accordions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
-@media (max-width: 520px) {
-  .install-guide-grid { grid-template-columns: 1fr; }
-}
-.install-guide-panel {
+.install-accordion {
   border-radius: var(--radius-sm);
-  padding: 16px 14px;
-  border: 1.5px solid rgba(0,0,0,0.06);
+  overflow: hidden;
+  border: 1.5px solid rgba(0,0,0,0.07);
 }
-.install-guide-panel.android {
-  background: #e8f8ef;
-}
-.install-guide-panel.iphone {
-  background: #e8f1fc;
-}
-[data-theme="dark"] .install-guide-panel.android { background: #1a2e22; }
-[data-theme="dark"] .install-guide-panel.iphone  { background: #1a2236; }
-.install-guide-panel h3 {
-  font-size: 0.98rem;
-  font-weight: 900;
+.install-accordion summary {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px;
+  cursor: pointer;
+  list-style: none;
+  font-family: 'Rubik', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
   color: var(--text);
-  margin-bottom: 12px;
-  text-align: center;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: filter 0.15s;
 }
+.install-accordion summary::-webkit-details-marker { display: none; }
+.install-accordion summary:hover { filter: brightness(0.96); }
+.install-accordion.android summary { background: #c8edd4; }
+.install-accordion.iphone  summary { background: #c4d9f5; }
+[data-theme="dark"] .install-accordion.android summary { background: #1f3827; }
+[data-theme="dark"] .install-accordion.iphone  summary { background: #1a2d45; }
+.install-platform-icon { font-size: 1.35rem; flex-shrink: 0; }
+.install-platform-name { flex: 1; }
+.install-chevron {
+  font-size: 1rem;
+  color: var(--text-muted);
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+}
+.install-accordion[open] .install-chevron { transform: rotate(180deg); }
+.install-accordion.android { background: #eaf7ef; }
+.install-accordion.iphone  { background: #eaf2fd; }
+[data-theme="dark"] .install-accordion.android { background: #162a1e; }
+[data-theme="dark"] .install-accordion.iphone  { background: #141f30; }
 .install-steps {
   list-style: none;
-  padding: 0;
+  padding: 14px 18px;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  counter-reset: install-step;
 }
 .install-steps li {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: 10px;
   font-size: 0.88rem;
   font-weight: 500;
   color: var(--text);
-  line-height: 1.45;
-  counter-increment: step;
+  line-height: 1.5;
+  counter-increment: install-step;
 }
+.install-steps li::before {
+  content: counter(install-step);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 900;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: white;
+}
+.install-accordion.android .install-steps li::before { background: #3aaa6a; }
+.install-accordion.iphone  .install-steps li::before { background: #3a82d4; }
 .step-emoji {
   font-size: 1rem;
   flex-shrink: 0;
@@ -726,7 +759,7 @@ footer {
   margin-top: 1px;
 }
 .install-note {
-  margin-top: 16px;
+  margin-top: 14px;
   text-align: center;
   font-size: 0.82rem;
   font-weight: 600;
