@@ -222,7 +222,7 @@ function renderScheduleTable(classId) {
       } else {
         const url = _links ? _links[cell.teacher] : null;
         td.classList.add('tt-live');
-        const inner = `<span class="tt-subject">${cell.subject}</span><span class="tt-teacher">${cell.teacher.split(' ')[0]}</span>`;
+        const inner = `<span class="tt-icon">🎥</span><span class="tt-subject">${cell.subject}</span><span class="tt-teacher">${cell.teacher.split(' ')[0]}</span>`;
         if (url) {
           const a = document.createElement('a');
           a.href = url; a.target = '_blank'; a.rel = 'noopener noreferrer';
