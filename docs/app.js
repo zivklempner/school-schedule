@@ -36,43 +36,6 @@ const SLOT_MINS = [[600,630],[630,660],[660,720],[720,780],[780,810]];
 // ── Hardcoded schedule data — multi-week, keyed by class ────
 const SCHEDULE_DATA = {
   g32: { weeks: [
-    { start: '2026-03-15', cells: [
-      [ // 10:00
-        { subject: 'רגשי',      teacher: 'רפית טסה'   },
-        { subject: 'מתמטיקה',   teacher: 'רפית טסה'   },
-        { subject: 'רגשי',      teacher: 'רפית טסה'   },
-        { subject: 'שפה',       teacher: 'אילת יוסף'  },
-        { subject: 'רגשי',      teacher: 'רפית טסה'   }
-      ],
-      [ // 10:30
-        { subject: 'מתמטיקה',         teacher: 'רפית טסה' },
-        { subject: 'אומנות / אנגלית', task: true           },
-        { subject: 'מתמטיקה',         teacher: 'רפית טסה' },
-        { subject: 'מדעים אופק',      task: true           },
-        { subject: 'שפה / מתמטיקה',   task: true           }
-      ],
-      [ // 11:00
-        { subject: 'מתמטיקה',     task: true             },
-        { subject: 'שפה',         teacher: 'אילת יוסף'  },
-        { subject: 'שפה / ספורט', task: true             },
-        { subject: 'מדעים',       teacher: 'רפית טסה'   },
-        { subject: 'ספורט',       teacher: 'נתנאל מדעי' }
-      ],
-      [ // 12:00
-        { subject: 'ספורט',         teacher: 'אוראל עטייה'     },
-        { subject: 'מיינדפולנס',    teacher: 'הגר מיינדפולנס'  },
-        { subject: 'מוסיקה',        teacher: 'סופייה משייב'    },
-        { subject: 'אנגלית',        teacher: 'כלנית רז שטראוס' },
-        { subject: 'אומנות שכבתי', teacher: 'רווית מזרחי'     }
-      ],
-      [ // 13:00
-        null,
-        null,
-        { subject: 'שרים ביחד', teacher: 'ארתור דיגלו'  },
-        { subject: 'שרים ביחד', teacher: 'סופייה משייב' },
-        null
-      ]
-    ]},
     { start: '2026-03-22', cells: [
       [ // 10:00  ראשון=סדר פסח, שני=שיח רגשי, שלישי-חמישי=חופשת פסח
         { subject: 'סדר פסח כיתתי',  teacher: 'רפית טסה'  },
