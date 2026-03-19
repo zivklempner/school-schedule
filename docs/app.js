@@ -33,82 +33,111 @@ const DAYS     = ['ראשון','שני','שלישי','רביעי','חמישי'];
 const TIMES    = ['10:00','10:30','11:00','12:00','13:00'];
 const SLOT_MINS = [[600,630],[630,660],[660,720],[720,780],[780,810]];
 
-// ── Hardcoded schedule data (one array of rows per class) ───
+// ── Hardcoded schedule data — multi-week, keyed by class ────
 const SCHEDULE_DATA = {
-  g32: [
-    [ // 10:00
-      { subject: 'רגשי',      teacher: 'רפית טסה'   },
-      { subject: 'מתמטיקה',   teacher: 'רפית טסה'   },
-      { subject: 'רגשי',      teacher: 'רפית טסה'   },
-      { subject: 'שפה',       teacher: 'אילת יוסף'  },
-      { subject: 'רגשי',      teacher: 'רפית טסה'   }
-    ],
-    [ // 10:30
-      { subject: 'מתמטיקה',         teacher: 'רפית טסה' },
-      { subject: 'אומנות / אנגלית', task: true           },
-      { subject: 'מתמטיקה',         teacher: 'רפית טסה' },
-      { subject: 'מדעים אופק',      task: true           },
-      { subject: 'שפה / מתמטיקה',   task: true           }
-    ],
-    [ // 11:00
-      { subject: 'מתמטיקה',     task: true             },
-      { subject: 'שפה',         teacher: 'אילת יוסף'  },
-      { subject: 'שפה / ספורט', task: true             },
-      { subject: 'מדעים',       teacher: 'רפית טסה'   },
-      { subject: 'ספורט',       teacher: 'נתנאל מדעי' }
-    ],
-    [ // 12:00
-      { subject: 'ספורט',         teacher: 'אוראל עטייה'     },
-      { subject: 'מיינדפולנס',    teacher: 'הגר מיינדפולנס'  },
-      { subject: 'מוסיקה',        teacher: 'סופייה משייב'    },
-      { subject: 'אנגלית',        teacher: 'כלנית רז שטראוס' },
-      { subject: 'אומנות שכבתי', teacher: 'רווית מזרחי'     }
-    ],
-    [ // 13:00
-      null,
-      null,
-      { subject: 'שרים ביחד', teacher: 'ארתור דיגלו'  },
-      { subject: 'שרים ביחד', teacher: 'סופייה משייב' },
-      null
-    ]
-  ],
-  g4: [
-    [ // 10:00
-      { subject: 'שפה',    teacher: 'נעה שחמון'        },
-      { subject: 'אנגלית', teacher: 'כלנית רז שטראוס'  },
-      { subject: 'מדעים',  teacher: 'סיגלית אורן'      },
-      { subject: 'שפה',    teacher: 'נעה שחמון'        },
-      { subject: 'שפה',    teacher: 'נעה שחמון'        }
-    ],
-    [ // 10:30
-      { subject: 'מתמטיקה',       task: true },
-      { subject: 'אנגלית + אומנות', task: true },
-      { subject: 'שפה + ספורט',   task: true },
-      { subject: 'מדעים',         task: true },
-      { subject: 'שפה + מתמטיקה', task: true }
-    ],
-    [ // 11:00
-      { subject: 'מתמטיקה', teacher: 'גלית דרי'       },
-      { subject: 'שפה',     teacher: 'נעה שחמון'      },
-      { subject: 'חברתי',   teacher: 'נעה שחמון'      },
-      { subject: 'מתמטיקה', teacher: 'גלית דרי'       },
-      { subject: 'ספורט',   teacher: 'אוראל עטייה'    }
-    ],
-    [ // 12:00
-      { subject: 'ספורט',      teacher: 'אוראל עטייה'    },
-      { subject: 'מיינדפולנס', teacher: 'הגר מיינדפולנס' },
-      { subject: 'מוזיקה',     teacher: 'סופייה משייב'   },
-      { subject: 'מדעים',      teacher: 'סיגלית אורן'    },
-      { subject: 'אומנות',     teacher: 'רווית מזרחי'    }
-    ],
-    [ // 13:00
-      null,
-      null,
-      { subject: 'העשרה שכבות א-ג',     teacher: 'ארתור דיגלו'  },
-      { subject: 'שרים ביחד שכבות ב-ג', teacher: 'סופייה משייב' },
-      null
-    ]
-  ]
+  g32: { weeks: [
+    { start: '2026-03-15', cells: [
+      [ // 10:00
+        { subject: 'רגשי',      teacher: 'רפית טסה'   },
+        { subject: 'מתמטיקה',   teacher: 'רפית טסה'   },
+        { subject: 'רגשי',      teacher: 'רפית טסה'   },
+        { subject: 'שפה',       teacher: 'אילת יוסף'  },
+        { subject: 'רגשי',      teacher: 'רפית טסה'   }
+      ],
+      [ // 10:30
+        { subject: 'מתמטיקה',         teacher: 'רפית טסה' },
+        { subject: 'אומנות / אנגלית', task: true           },
+        { subject: 'מתמטיקה',         teacher: 'רפית טסה' },
+        { subject: 'מדעים אופק',      task: true           },
+        { subject: 'שפה / מתמטיקה',   task: true           }
+      ],
+      [ // 11:00
+        { subject: 'מתמטיקה',     task: true             },
+        { subject: 'שפה',         teacher: 'אילת יוסף'  },
+        { subject: 'שפה / ספורט', task: true             },
+        { subject: 'מדעים',       teacher: 'רפית טסה'   },
+        { subject: 'ספורט',       teacher: 'נתנאל מדעי' }
+      ],
+      [ // 12:00
+        { subject: 'ספורט',         teacher: 'אוראל עטייה'     },
+        { subject: 'מיינדפולנס',    teacher: 'הגר מיינדפולנס'  },
+        { subject: 'מוסיקה',        teacher: 'סופייה משייב'    },
+        { subject: 'אנגלית',        teacher: 'כלנית רז שטראוס' },
+        { subject: 'אומנות שכבתי', teacher: 'רווית מזרחי'     }
+      ],
+      [ // 13:00
+        null,
+        null,
+        { subject: 'שרים ביחד', teacher: 'ארתור דיגלו'  },
+        { subject: 'שרים ביחד', teacher: 'סופייה משייב' },
+        null
+      ]
+    ]},
+    { start: '2026-03-22', cells: [
+      [ // 10:00  ראשון=סדר פסח, שני=שיח רגשי, שלישי-חמישי=חופשת פסח
+        { subject: 'סדר פסח כיתתי',  teacher: 'רפית טסה'  },
+        { subject: 'שיח רגשי',        teacher: 'רפית טסה'  },
+        null, null, null
+      ],
+      [ // 10:30
+        { subject: 'סדר פסח כיתתי',  teacher: 'רפית טסה'  },
+        { subject: 'אומנות / אנגלית', task: true            },
+        null, null, null
+      ],
+      [ // 11:00
+        { subject: 'מתמטיקה', task: true           },
+        { subject: 'שפה',     teacher: 'אילת יוסף' },
+        null, null, null
+      ],
+      [ // 12:00
+        { subject: 'ספורט',      teacher: 'אוראל עטייה'   },
+        { subject: 'מיינדפולנס', teacher: 'הגר מיינדפולנס' },
+        null, null, null
+      ],
+      [ // 13:00
+        null, null, null, null, null
+      ]
+    ]}
+  ]},
+  g4: { weeks: [
+    { start: '2026-03-15', cells: [
+      [ // 10:00
+        { subject: 'שפה',    teacher: 'נעה שחמון'        },
+        { subject: 'אנגלית', teacher: 'כלנית רז שטראוס'  },
+        { subject: 'מדעים',  teacher: 'סיגלית אורן'      },
+        { subject: 'שפה',    teacher: 'נעה שחמון'        },
+        { subject: 'שפה',    teacher: 'נעה שחמון'        }
+      ],
+      [ // 10:30
+        { subject: 'מתמטיקה',        task: true },
+        { subject: 'אנגלית + אומנות', task: true },
+        { subject: 'שפה + ספורט',    task: true },
+        { subject: 'מדעים',          task: true },
+        { subject: 'שפה + מתמטיקה',  task: true }
+      ],
+      [ // 11:00
+        { subject: 'מתמטיקה', teacher: 'גלית דרי'    },
+        { subject: 'שפה',     teacher: 'נעה שחמון'   },
+        { subject: 'חברתי',   teacher: 'נעה שחמון'   },
+        { subject: 'מתמטיקה', teacher: 'גלית דרי'    },
+        { subject: 'ספורט',   teacher: 'אוראל עטייה' }
+      ],
+      [ // 12:00
+        { subject: 'ספורט',      teacher: 'אוראל עטייה'    },
+        { subject: 'מיינדפולנס', teacher: 'הגר מיינדפולנס' },
+        { subject: 'מוזיקה',     teacher: 'סופייה משייב'   },
+        { subject: 'מדעים',      teacher: 'סיגלית אורן'    },
+        { subject: 'אומנות',     teacher: 'רווית מזרחי'    }
+      ],
+      [ // 13:00
+        null,
+        null,
+        { subject: 'העשרה שכבות א-ג',     teacher: 'ארתור דיגלו'  },
+        { subject: 'שרים ביחד שכבות ב-ג', teacher: 'סופייה משייב' },
+        null
+      ]
+    ]}
+  ]}
 };
 
 // ── Per-class teacher lists ──────────────────────────────────
@@ -178,8 +207,9 @@ function classifyLink(url) {
 // ── Timetable renderer ─────────────────────────────────────
 
 function renderScheduleTable(classId) {
-  const cells = SCHEDULE_DATA[classId];
-  if (!cells) return;
+  const data = SCHEDULE_DATA[classId];
+  if (!data) return;
+  const cells = findCurrentWeek(data.weeks).cells;
   const table = document.getElementById('timetable');
   table.innerHTML = '';
 
@@ -624,7 +654,7 @@ document.title = cfg.shareTitle;
     document.getElementById('week-range').textContent =
       `${fmt(wStart)} – ${fmt(wEnd)} ${wEnd.getFullYear()}`;
   } else {
-    _activeCells = SCHEDULE_DATA[classId];
+    _activeCells = findCurrentWeek(SCHEDULE_DATA[classId].weeks).cells;
   }
   updateLive(_activeCells);
   updateLessonTimer(_activeCells);
