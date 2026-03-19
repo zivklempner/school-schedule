@@ -37,28 +37,29 @@ const SLOT_MINS = [[600,630],[630,660],[660,720],[720,780],[780,810]];
 const SCHEDULE_DATA = {
   g32: { weeks: [
     { start: '2026-03-22', cells: [
-      [ // 10:00  ראשון=סדר פסח, שני=שיח רגשי, שלישי-חמישי=חופשת פסח
+      [ // 10:00
         { subject: 'סדר פסח כיתתי',  teacher: 'רפית טסה'  },
         { subject: 'שיח רגשי',        teacher: 'רפית טסה'  },
-        null, null, null
+        { holiday: true }, { holiday: true }, { holiday: true }
       ],
       [ // 10:30
         { subject: 'סדר פסח כיתתי',  teacher: 'רפית טסה'  },
         { subject: 'אומנות / אנגלית', task: true            },
-        null, null, null
+        { holiday: true }, { holiday: true }, { holiday: true }
       ],
       [ // 11:00
         { subject: 'מתמטיקה', task: true           },
         { subject: 'שפה',     teacher: 'אילת יוסף' },
-        null, null, null
+        { holiday: true }, { holiday: true }, { holiday: true }
       ],
       [ // 12:00
         { subject: 'ספורט',      teacher: 'אוראל עטייה'   },
         { subject: 'מיינדפולנס', teacher: 'הגר מיינדפולנס' },
-        null, null, null
+        { holiday: true }, { holiday: true }, { holiday: true }
       ],
       [ // 13:00
-        null, null, null, null, null
+        null, null,
+        { holiday: true }, { holiday: true }, { holiday: true }
       ]
     ]}
   ]},
@@ -206,6 +207,9 @@ function renderScheduleTable(classId) {
 
       if (!cell) {
         td.classList.add('tt-empty');
+      } else if (cell.holiday) {
+        td.classList.add('tt-holiday');
+        td.innerHTML = '<span class="tt-holiday-label">🍷<br>חופשת<br>פסח</span>';
       } else if (cell.task) {
         td.classList.add('tt-task');
         const span = document.createElement('span');
@@ -606,19 +610,17 @@ document.title = cfg.shareTitle;
   renderScheduleTable(classId);
   renderTeacherGrid(classId);
 
-  // Update live indicators for the switched class
+  // Week range always from SCHEDULE_DATA (authoritative source)
+  const sdWeek = findCurrentWeek(SCHEDULE_DATA[classId].weeks);
+  const wStart = parseLocalDate(sdWeek.start);
+  const wEnd   = new Date(wStart); wEnd.setDate(wStart.getDate() + 4);
+  const fmt    = d => `${d.getDate()} ${HEBREW_MONTHS[d.getMonth()]}`;
+  document.getElementById('week-range').textContent =
+    `${fmt(wStart)} – ${fmt(wEnd)} ${wEnd.getFullYear()}`;
+
+  // Live indicators: use fetched JSON cells if available, else SCHEDULE_DATA
   const data = _allSchedules[classId];
-  if (data) {
-    const week = findCurrentWeek(data.weeks);
-    _activeCells = week.cells;
-    const wStart = parseLocalDate(week.start);
-    const wEnd   = new Date(wStart); wEnd.setDate(wStart.getDate() + 4);
-    const fmt    = d => `${d.getDate()} ${HEBREW_MONTHS[d.getMonth()]}`;
-    document.getElementById('week-range').textContent =
-      `${fmt(wStart)} – ${fmt(wEnd)} ${wEnd.getFullYear()}`;
-  } else {
-    _activeCells = findCurrentWeek(SCHEDULE_DATA[classId].weeks).cells;
-  }
+  _activeCells = data ? findCurrentWeek(data.weeks).cells : sdWeek.cells;
   updateLive(_activeCells);
   updateLessonTimer(_activeCells);
 }
