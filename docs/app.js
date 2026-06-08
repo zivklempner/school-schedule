@@ -61,6 +61,43 @@ const SCHEDULE_DATA = {
         null, null,
         { holiday: true }, { holiday: true }, { holiday: true }
       ]
+    ]},
+    { start: '2026-06-07', cells: [
+      [ // 10:00
+        { subject: 'רגשי',    teacher: 'רפית טסה'  },
+        { subject: 'מתמטיקה', teacher: 'רפית טסה'  },
+        { subject: 'רגשי',    teacher: 'רפית טסה'  },
+        { subject: 'שפה',     teacher: 'אילת יוסף' },
+        { subject: 'רגשי',    teacher: 'רפית טסה'  }
+      ],
+      [ // 10:30
+        { subject: 'מתמטיקה',         teacher: 'רפית טסה' },
+        { subject: 'אומנות / אנגלית', task: true           },
+        { subject: 'מתמטיקה',         teacher: 'רפית טסה' },
+        { subject: 'מתמטיקה אופק',    task: true           },
+        { subject: 'שפה / מתמטיקה',   task: true           }
+      ],
+      [ // 11:00
+        { subject: 'מתמטיקה',     task: true           },
+        { subject: 'שפה',         teacher: 'אילת יוסף' },
+        { subject: 'שפה / ספורט', task: true           },
+        { subject: 'מתמטיקה',     teacher: 'רפית טסה'  },
+        { subject: 'ספורט',       teacher: 'נתנאל מדעי'}
+      ],
+      [ // 12:00
+        { subject: 'ספורט',        teacher: 'אוראל עטייה'    },
+        { subject: 'מיינדפולנס',   teacher: 'הגר מיינדפולנס' },
+        { subject: 'מוסיקה',       teacher: 'סופייה משייב'   },
+        { subject: 'אנגלית',       teacher: 'כלנית רז שטראוס'},
+        { subject: 'אומנות שכבתי', teacher: 'רווית מזרחי'   }
+      ],
+      [ // 13:00
+        null,
+        null,
+        { subject: 'שרים ביחד', teacher: 'ארתור דיגלו'  },
+        { subject: 'שרים ביחד', teacher: 'סופייה משייב' },
+        null
+      ]
     ]}
   ]},
   g4: { weeks: [
